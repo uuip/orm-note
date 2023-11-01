@@ -1,0 +1,7 @@
+bigserial
+bigint int8
+integer int4 int
+
+date
+timestamptz timestamp with time zone
+timestamp timestamp without time zone
