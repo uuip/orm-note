@@ -17,8 +17,6 @@ from sqlalchemy.dialects.postgresql import *
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import *
-from sqlalchemy.orm.attributes import flag_modified
-from sqlalchemy.sql import operators
 
 from fakedata import make, setup  # noqa
 from setting import settings
@@ -106,11 +104,18 @@ Base.metadata.create_all(bind=db)
 Session = sessionmaker(bind=db)
 
 with Session() as session:
-    with session.begin():
-        session.execute(select(User).where(User.id == 1500))
+    session.execute(insert(User).values([{User.name: "cccc", User.org: "lkm", "books": []}]))
+    session.commit()
 
+with Session() as session:
+    with session.begin():
+        session.execute(insert(User).values([{User.name: "adef", User.org: "lkm", "books": []}]))
+
+# include begin()/commit()/rollback()
+# commits the transaction, closes the session
 with Session.begin() as session:
-    session.execute(select(User).where(User.id == 1500))
+    session.execute(insert(User).values([{User.name: "mkliouza", User.org: "lkm", "books": []}]))
+exit()
 
 
 async def async_s():
