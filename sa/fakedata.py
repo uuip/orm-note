@@ -8,7 +8,6 @@ import factory.fuzzy
 import faker
 from sqlalchemy import *
 from sqlalchemy.dialects.postgresql import JSONB, INET, CIDR
-from sqlalchemy.engine import URL
 from sqlalchemy.orm import *
 
 model_factorys = {}
@@ -143,8 +142,6 @@ def field_rule(field: Column, session):
         if driver == "psycopg":
             return fake_inet()
         return factory.Faker("ipv4", network=True)
-    if isinstance(field.type, URL):
-        return factory.Faker("url")
     if isinstance(field.type, Enum):
         return factory.fuzzy.FuzzyChoice(list(field.type.enum_class))
     if isinstance(field.type, Integer):

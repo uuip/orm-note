@@ -3,21 +3,10 @@ from zoneinfo import ZoneInfo
 
 from pydantic import *
 from sqlalchemy import *
-from sqlalchemy.ext.automap import automap_base
-from sqlalchemy.orm import *
 
-from setting import settings
+from sa.reflect import Model
+from sa.session import s
 
-db = create_engine(settings.db)
-AutoBase = automap_base()
-
-# class Tx(AutoBase):
-#     __tablename__ = "transactions"
-
-AutoBase.prepare(autoload_with=db)
-Model = AutoBase.classes.user
-Session = sessionmaker(bind=db)
-s = Session()
 obj = s.scalar(select(Model).where(Model.id == 1))
 print(obj.id)
 
