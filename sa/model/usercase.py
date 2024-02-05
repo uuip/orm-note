@@ -46,12 +46,12 @@ class Order(Base):
 
     id = mapped_column(BigInteger, Identity(), primary_key=True)
     updated_at = mapped_column(
-        DateTime(timezone=True),
+        TIMESTAMP(timezone=True, precision=0),
         server_default=func.current_timestamp(0),
-        onupdate=func.current_timestamp(0),
+        onupdate=func.current_timestamp(),
     )
     created_at = mapped_column(
-        DateTime(timezone=True),
+        TIMESTAMP(timezone=True, precision=0),
         server_default=func.current_timestamp(),
     )
     quantity = mapped_column(BigInteger)
