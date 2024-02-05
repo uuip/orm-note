@@ -12,11 +12,11 @@ from setting import settings
 #  -c statement_timeout=300
 # url = URL.create()
 db = create_engine(settings.db, echo=True, pool_size=5, connect_args={"options": "-c TimeZone=Asia/Tokyo"})
-Base.metadata.drop_all(bind=db, tables=[])
-Base.metadata.create_all(bind=db)
-
 Session = sessionmaker(bind=db)
 s = Session()
+
+Base.metadata.drop_all(bind=db, tables=[])
+Base.metadata.create_all(bind=db)
 
 
 async def asession():
