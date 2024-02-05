@@ -20,7 +20,8 @@ Base.metadata.create_all(bind=db)
 
 
 async def asession():
-    async_db = create_async_engine(settings.db, echo=False, pool_size=5)
+    # connect_args={"server_settings": {"TimeZone": "Asia/Tokyo"}, 不过asyncpg在输出时仍转为UTC且其故意为之
+    async_db = create_async_engine(settings.db_asyncpg, echo=False, pool_size=5)
     Session = async_sessionmaker(bind=async_db)
 
     async with Session.begin() as s:
