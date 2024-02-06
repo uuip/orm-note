@@ -2,7 +2,7 @@ from functools import cached_property
 from pathlib import Path
 from urllib.parse import urlparse
 
-from pydantic import Field, model_validator, computed_field  # noqa
+from pydantic import Field, computed_field
 from pydantic_settings import SettingsConfigDict, BaseSettings
 
 _env_file = Path(__file__).parent / ".env"
@@ -22,11 +22,6 @@ class Settings(BaseSettings):
     @cached_property
     def db_asyncpg(self) -> str:
         return urlparse(self.db)._replace(scheme="postgresql+asyncpg").geturl()
-
-    # @model_validator(mode="before")
-    # def variable(cls, value):
-    #     value["db_standard"] = urlparse(value["db_url"])._replace(scheme="postgresql").geturl()
-    #     return value
 
 
 settings = Settings()
