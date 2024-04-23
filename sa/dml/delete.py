@@ -1,16 +1,16 @@
 from sqlalchemy import *
 
 from sa.model.example import Author
-from sa.session import Session
+from sa.session import SessionMaker
 
 
-def delete_single():
+def delete_obj():
     obj = s.scalar(select(Author).limit(1))
     s.delete(obj)
     s.commit()
 
 
-def bulk_delete():
+def delete_with_query():
     s.query(Author).filter(Author.id == 104).delete()
     s.commit()
     s.execute(delete(Author).where(Author.id == 105))
@@ -18,6 +18,6 @@ def bulk_delete():
 
 
 if __name__ == "__main__":
-    with Session() as s:
-        delete_single()
-        bulk_delete()
+    with SessionMaker() as s:
+        delete_obj()
+        delete_with_query()

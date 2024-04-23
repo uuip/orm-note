@@ -1,46 +1,74 @@
 from sqlalchemy import *
 from sqlalchemy.dialects.postgresql import insert
 
+from fakedata.populate import fake_column_value
 from sa.model.example import Author
-from sa.session import Session
+from sa.session import SessionMaker
+
+
+def make_author():
+    return {"name": fake_column_value(Author.name), "org": fake_column_value(Author.org), "books": []}
 
 
 def insert_single():
-    user_data = {"name": "myname1", "org": "some", "books": []}
+    user_data = make_author()
     user = Author(**user_data)
     s.add(user)
     s.commit()
     print(user.id)
 
-
-def bulk_insert():
-    user_data = {"name": "111aaa", "org": "some", "books": []}
-    user_data2 = {"name": "111bbb", "org": "some", "books": []}
-    user = Author(**user_data)
-    s.add_all([user])
-    s.commit()
-
-    # # https://docs.sqlalchemy.org/en/20/dialects/postgresql.html#updating-using-the-excluded-insert-values
-    # returning 触发 use_insertmanyvalues 优化；否则会将params拆开，每个执行insert
-    s.execute(insert(Author).on_conflict_do_nothing().returning(Author.id), [user_data, user_data2])
-    s.commit()
-
-    # 不需 returning，values是一个整体
-    st = (
-        insert(Author)
-        .values(
-            [
-                {Author.name: "111ccc", "org": "2022-1-1", "books": []},
-                {Author.name: "111ddd", "org": "2022-1-1", "books": []},
-            ]
-        )
-        .on_conflict_do_nothing()
+    st = insert(P).values(
+        {
+            P.address: address,
+            P.has_approved: has_approved,
+        }
+    )
+    st = st.on_conflict_do_update(
+        index_elements=[P.address],
+        set_={"has_approved": st.excluded.has_approved},
     )
     s.execute(st)
     s.commit()
 
 
+def bulk_insert():
+    user1 = Author(**make_author())
+    user2 = Author(**make_author())
+    # insertmanyvalues
+    s.add_all([user1, user2])
+    s.commit()
+
+    # 下述2种insert，插入关联对象xxx时，其key应当使用 xxx_id,而不是映射的xxx
+
+    # returning 触发 insertmanyvalues 优化, key只能是字符串；否则executemany; psycopg2的executemany很慢, psycopg的正常
+    # https://docs.sqlalchemy.org/en/20/core/connections.html#insert-many-values-behavior-for-insert-statements
+    st = insert(Author).returning(Author.id)
+    s.execute(
+        st,
+        [
+            make_author(),
+            make_author(),
+        ],
+    )
+    s.commit()
+
+    # 不需 returning，一条语句 INSERT ... VALUES; key可以是Author.xxx
+    # https://docs.sqlalchemy.org/en/20/core/dml.html#sqlalchemy.sql.expression.Insert.values
+    st = insert(Author).values(
+        [
+            make_author(),
+            make_author(),
+        ]
+    )
+    s.execute(st)
+    s.commit()
+
+    # 不丢弃None字段
+    # s.execute(insert(Author).execution_options(render_nulls=True), [user_data, user_data2])
+
+    # https://docs.sqlalchemy.org/en/20/dialects/postgresql.html#updating-using-the-excluded-insert-values
+
+
 if __name__ == "__main__":
-    with Session() as s:
-        insert_single()
+    with SessionMaker() as s:
         bulk_insert()
