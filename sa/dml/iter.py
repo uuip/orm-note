@@ -7,8 +7,7 @@ from sa.session import Session, asession
 
 
 async def async_s():
-    s = asession()
-    async with s.begin() as s:
+    async with asession().begin() as s:
         async for x in await s.stream_scalars(select(Author).execution_options(yield_per=500)):
             print(x.id)
 
