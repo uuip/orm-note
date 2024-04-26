@@ -16,16 +16,18 @@ def insert_single():
 def bulk_insert():
     user_data = {"name": "111aaa", "org": "some", "books": []}
     user_data2 = {"name": "111bbb", "org": "some", "books": []}
-    user = Author(**user_data)
-    s.add_all([user])
+    user1 = Author(**user_data)
+    user2 = Author(**user_data2)
+    # 一条语句
+    s.add_all([user1, user2])
     s.commit()
 
-    # # https://docs.sqlalchemy.org/en/20/dialects/postgresql.html#updating-using-the-excluded-insert-values
+    # https://docs.sqlalchemy.org/en/20/dialects/postgresql.html#updating-using-the-excluded-insert-values
     # returning 触发 use_insertmanyvalues 优化；否则会将params拆开，每个执行insert
-    s.execute(insert(Author).on_conflict_do_nothing().returning(Author.id), [user_data, user_data2])
+    s.execute(insert(Author).returning(Author.id), [user_data, user_data2])
     s.commit()
 
-    # 不需 returning，values是一个整体
+    # 不需 returning，values是一个整体，一条语句
     st = (
         insert(Author)
         .values(
@@ -43,4 +45,4 @@ def bulk_insert():
 if __name__ == "__main__":
     with Session() as s:
         insert_single()
-        bulk_insert()
+        # bulk_insert()
