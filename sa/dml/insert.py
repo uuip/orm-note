@@ -18,16 +18,17 @@ def bulk_insert():
     user_data2 = {"name": "111bbb", "org": "some", "books": []}
     user1 = Author(**user_data)
     user2 = Author(**user_data2)
-    # 一条语句
+    # insertmanyvalues
     s.add_all([user1, user2])
     s.commit()
 
-    # https://docs.sqlalchemy.org/en/20/dialects/postgresql.html#updating-using-the-excluded-insert-values
-    # returning 触发 use_insertmanyvalues 优化；否则会将params拆开，每个执行insert
+    # returning 触发 insertmanyvalues 优化；否则executemany; psycopg的executemany很慢
+    # https://docs.sqlalchemy.org/en/20/core/connections.html#insert-many-values-behavior-for-insert-statements
     s.execute(insert(Author).returning(Author.id), [user_data, user_data2])
     s.commit()
 
-    # 不需 returning，values是一个整体，一条语句
+    # 不需 returning，一条语句 INSERT ... VALUES
+    # https://docs.sqlalchemy.org/en/20/core/dml.html#sqlalchemy.sql.expression.Insert.values
     st = (
         insert(Author)
         .values(
@@ -41,8 +42,12 @@ def bulk_insert():
     s.execute(st)
     s.commit()
 
+    # 不丢弃None字段
+    # s.execute(insert(Author).execution_options(render_nulls=True), [user_data, user_data2])
+
+    # https://docs.sqlalchemy.org/en/20/dialects/postgresql.html#updating-using-the-excluded-insert-values
+
 
 if __name__ == "__main__":
     with Session() as s:
-        insert_single()
-        # bulk_insert()
+        bulk_insert()
