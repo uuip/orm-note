@@ -1,6 +1,7 @@
 import datetime
 import sys
 import uuid
+from functools import lru_cache
 from pathlib import Path
 
 import pandas as pd
@@ -20,6 +21,7 @@ yesterday = today - datetime.timedelta(hours=24 * 7)
 tomorrow = today + datetime.timedelta(hours=24 * 2)
 
 
+@lru_cache()
 def is_unique(field):
     if field.unique:
         return field.unique
@@ -92,6 +94,10 @@ def field_rule(field: Column):
             return default()
         return default
     raise TypeError(f"no rule for this type: {field.type}")
+
+
+def make(model):
+    return model(**{field_name: field_rule(field) for field_name, field in model.__mapper__.c.items()})
 
 
 if __name__ == "__main__":

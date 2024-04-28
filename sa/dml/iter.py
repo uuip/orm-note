@@ -3,11 +3,11 @@ import asyncio
 from sqlalchemy import select
 
 from sa.model.example import Author
-from sa.session import Session, asession
+from sa.session import Session, async_session
 
 
 async def async_s():
-    async with asession().begin() as s:
+    async with async_session().begin() as s:
         async for x in await s.stream_scalars(select(Author).execution_options(yield_per=500)):
             print(x.id)
 

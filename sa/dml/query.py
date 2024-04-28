@@ -9,14 +9,12 @@ from sa.session import Session
 
 s = Session()
 
-# 在重复查询相同的对象时，直接先查询本地的缓存；需要expire或refresh，或expire_on_commit
-
 # &, | and ~
 
 # 字面字段,
 literal_column("0")
-# 字面值
-literal
+# 使xyz作为一个参数传递给数据库
+literal("xyz")
 # 字段
 column("abc")
 
@@ -34,14 +32,14 @@ select(Order.id, (Order.quantity * Order.price).label("total"))
 # 表 (返回多列的结构)别名
 aliased
 
-# 刷新对象
+# 在重复查询相同的对象时，直接先查询本地的缓存；需要expire或refresh，或expire_on_commit
 s.refresh(obj)
 select(Author).execution_options(populate_existing=True)
 
 # 组装结果
 st = select(Bundle("attr", Author.name, Order.quantity)).join_from(Author, Order).where(Order.price < 159)
-for x in s.scalars(st):
-    (x.name, x.quantity)
+for x in s.execute(st):
+    (x.attr.name, x.attr.quantity)
 # named tuple
 st = select(Author.name, Order.quantity).join_from(Author, Order).where(Order.price < 159)
 for x in s.execute(st):

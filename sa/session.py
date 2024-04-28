@@ -4,31 +4,31 @@ from sqlalchemy.orm import *
 
 from setting import settings
 
+# 修改默认方言为psycopg
 # from sqlalchemy.dialects import postgresql as pg
 # pg.dialect = pg.base.dialect = pg.psycopg.dialect
 
 # os.environ["PGTZ"] = "utc"
 # psycopg: connect_args={"options": "-c TimeZone=Asia/Tokyo"}
-# -c statement_timeout=300
 # url = URL.create()
 # default pool_size=5
 db = create_engine(settings.db, echo=False, pool_size=10)
 Session = sessionmaker(bind=db)
 
 
-def asession():
+def async_session():
     async_db = create_async_engine(settings.db_asyncpg, echo=False, pool_size=10)
-    Session = async_sessionmaker(bind=async_db)
-    return Session
+    async_session = async_sessionmaker(bind=async_db)
+    return async_session
 
 
-def a():
+def usage_a():
     with Session() as session:
         session.execute(...)
         session.commit()
 
 
-def b():
+def usage_b():
     # inner context calls session.commit(), if there were no exceptions
     # outer context calls session.close()
     with Session() as session:
@@ -36,7 +36,7 @@ def b():
             session.execute(...)
 
 
-def c():
+def usage_c():
     # include begin()/commit()/rollback()
     # commits the transaction, closes the session
     with Session.begin() as session:

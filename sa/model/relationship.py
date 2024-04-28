@@ -1,7 +1,7 @@
 from sqlalchemy import *
 from sqlalchemy.orm import *
 
-from . import Base
+from . import Base, OnDelete
 
 
 class MiddleTable(Base):
@@ -20,7 +20,7 @@ class User(Base):
 
     wife = relationship("Wife", uselist=False, back_populates="user")
 
-    country_id = Column(ForeignKey("country.id", ondelete="CASCADE"))
+    country_id = Column(ForeignKey("country.id", ondelete=OnDelete.cascade))
     country = relationship("Country", back_populates="users")
 
     projects = relationship("Project", secondary=MiddleTable.__table__, back_populates="join_users")
@@ -35,7 +35,7 @@ class Email(Base):
 
     id = Column(BigInteger, primary_key=True)
     address = Column(String)
-    user_id = Column(ForeignKey(User.id, ondelete="CASCADE"))
+    user_id = Column(ForeignKey(User.id, ondelete=OnDelete.cascade))
     user = relationship(User, back_populates="emails")
 
 
@@ -45,7 +45,7 @@ class Wife(Base):
 
     id = Column(BigInteger, primary_key=True)
     name = Column(String)
-    user_id = Column(ForeignKey(User.id, ondelete="CASCADE"), unique=True)
+    user_id = Column(ForeignKey(User.id, ondelete=OnDelete.cascade), unique=True)
     user = relationship(User, back_populates="wife")
 
 
@@ -73,7 +73,7 @@ class Message(Base):
 
     id = Column(BigInteger, primary_key=True)
     msg = Column(String)
-    sender_id = Column(ForeignKey(User.id, ondelete="CASCADE"))
-    receiver_id = Column(ForeignKey(User.id, ondelete="CASCADE"))
+    sender_id = Column(ForeignKey(User.id, ondelete=OnDelete.cascade))
+    receiver_id = Column(ForeignKey(User.id, ondelete=OnDelete.cascade))
     sender = relationship(User, foreign_keys=sender_id, back_populates="allsendmsg")
     receiver = relationship(User, foreign_keys=receiver_id, back_populates="allreceivedmsg")

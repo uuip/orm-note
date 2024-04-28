@@ -1,12 +1,17 @@
 from sqlalchemy import *
 from sqlalchemy.dialects.postgresql import insert
 
+from fakedata.fakedata import field_rule
 from sa.model.example import Author
 from sa.session import Session
 
 
+def make_author():
+    return {"name": field_rule(Author.name), "org": field_rule(Author.org), "books": []}
+
+
 def insert_single():
-    user_data = {"name": "myname1", "org": "some", "books": []}
+    user_data = make_author()
     user = Author(**user_data)
     s.add(user)
     s.commit()
@@ -14,30 +19,31 @@ def insert_single():
 
 
 def bulk_insert():
-    user_data = {"name": "111aaa", "org": "some", "books": []}
-    user_data2 = {"name": "111bbb", "org": "some", "books": []}
-    user1 = Author(**user_data)
-    user2 = Author(**user_data2)
+    user1 = Author(**make_author())
+    user2 = Author(**make_author())
     # insertmanyvalues
     s.add_all([user1, user2])
     s.commit()
 
-    # returning 触发 insertmanyvalues 优化；否则executemany; psycopg的executemany很慢
+    # returning 触发 insertmanyvalues 优化；否则executemany; psycopg2的executemany很慢, psycopg的正常
     # https://docs.sqlalchemy.org/en/20/core/connections.html#insert-many-values-behavior-for-insert-statements
-    s.execute(insert(Author).returning(Author.id), [user_data, user_data2])
+    st = insert(Author).returning(Author.id)
+    s.execute(
+        st,
+        [
+            make_author(),
+            make_author(),
+        ],
+    )
     s.commit()
 
     # 不需 returning，一条语句 INSERT ... VALUES
     # https://docs.sqlalchemy.org/en/20/core/dml.html#sqlalchemy.sql.expression.Insert.values
-    st = (
-        insert(Author)
-        .values(
-            [
-                {Author.name: "111ccc", "org": "2022-1-1", "books": []},
-                {Author.name: "111ddd", "org": "2022-1-1", "books": []},
-            ]
-        )
-        .on_conflict_do_nothing()
+    st = insert(Author).values(
+        [
+            make_author(),
+            make_author(),
+        ]
     )
     s.execute(st)
     s.commit()

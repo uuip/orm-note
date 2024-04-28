@@ -1,7 +1,7 @@
 from sqlalchemy import *
 
 from sa.model.example import Author, Order, ShipTransfer, ShipTransfer2
-from sa.session import db, Session
+from sa.session import Session
 
 
 def update_single():
@@ -25,16 +25,6 @@ def bulk_update():
     # executemany执行
     s.commit()
 
-    # 批量更新 UPDATE..FROM (VALUES ...), 所有参数一次构造为VALUES
-    vst = values(
-        column("org", Text),
-        column("nickname", Text),
-        name="vst",
-    ).data([["dskdkdkd", "aaaa"], ["dskdkdkd22", "aaaa"]])
-    st = update(Author).where(Author.org == vst.c.org).values({Author.nickname: vst.c.nickname})
-    s.execute(st)
-    s.commit()
-
     # 指定pk, params的key只能是字符串; executemany执行
     # https://docs.sqlalchemy.org/en/20/orm/queryguide/dml.html#orm-bulk-update-by-primary-key
     obj = s.scalar(select(Author).limit(1))
@@ -43,15 +33,37 @@ def bulk_update():
 
     # 批量更新：where与value绑定到字典的key; executemany执行
     # https://docs.sqlalchemy.org/en/20/tutorial/data_update.html#the-update-sql-expression-construct
-    to_update = [{"v_name": "aaaa", "v_nickname": "bindparambbbb"}, {"v_name": "aaaa1", "v_nickname": "bindparambbbb"}]
-    st = update(Author).where(Author.nickname == bindparam("v_name")).values(nickname=bindparam("v_nickname"))
-    # 只指定where条件, 其余字段与orm相同
+    # where条件bindparam, 其余字段与orm相同
     # https://docs.sqlalchemy.org/en/20/orm/queryguide/dml.html#disabling-bulk-orm-update-by-primary-key-for-an-update-statement-with-multiple-parameter-sets
-    to_update = [{"v_name": "aaaa", "nickname": "bindparambbbb"}, {"v_name": "aaaa1", "nickname": "bindparambbbb"}]
+    to_update = [
+        {"v_name": "aaaa", "nickname": "bindparambbbb"},
+        {"v_name": "aaaa1", "nickname": "bindparambbbb"},
+    ]
     st = update(Author).where(Author.nickname == bindparam("v_name"))
     # with db.begin() as conn:
     with s.connection() as conn:
         conn.execute(st, to_update)
+
+
+def update_from():
+    # https://docs.sqlalchemy.org/en/20/tutorial/data_update.html#update-from
+    st = (
+        update(ShipTransfer)
+        .where(ShipTransfer.token_id == ShipTransfer2.token_id)
+        .values({ShipTransfer.from_: ShipTransfer2.to})
+    )
+    s.execute(st)
+    s.commit()
+
+    # UPDATE..FROM (VALUES ...), 所有参数一次构造为VALUES
+    vst = values(
+        column("org", Text),
+        column("nickname", Text),
+        name="vst",
+    ).data([["dskdkdkd", "aaaa"], ["dskdkdkd22", "aaaa"]])
+    st = update(Author).where(Author.org == vst.c.org).values({Author.nickname: vst.c.nickname})
+    s.execute(st)
+    s.commit()
 
 
 def update_with_case_value():
@@ -73,17 +85,6 @@ def correlated_updates():
     # https://docs.sqlalchemy.org/en/20/tutorial/data_update.html#correlated-updates
     query_owner = select(ShipTransfer2.from_).where(ShipTransfer.token_id == ShipTransfer2.token_id).scalar_subquery()
     st = update(ShipTransfer).values(to=query_owner)
-    s.execute(st)
-    s.commit()
-
-
-def update_from():
-    # https://docs.sqlalchemy.org/en/20/tutorial/data_update.html#update-from
-    st = (
-        update(ShipTransfer)
-        .where(ShipTransfer.token_id == ShipTransfer2.token_id)
-        .values({ShipTransfer.from_: ShipTransfer2.to})
-    )
     s.execute(st)
     s.commit()
 
