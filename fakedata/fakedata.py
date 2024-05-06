@@ -26,8 +26,11 @@ def is_unique(field):
     if field.unique:
         return field.unique
     for x in field.table.constraints:
-        if isinstance(x, UniqueConstraint) and len(x.columns) == 1 and x.columns[0].name == field.name:
+        if isinstance(x, UniqueConstraint) and len(x.columns) == 1 and field.name in x.columns:
             return True
+    for x in field.table.indexes:
+        if isinstance(x, Index) and len(x.columns) == 1 and field.name in x.columns:
+            return x.unique
 
 
 def field_rule(field: Column):
@@ -102,7 +105,7 @@ def make(model):
 
 if __name__ == "__main__":
     with Session() as s:
-        for t in ["geoip2_network"]:
+        for t in ["author"]:
             model = models[t]
             for x in range(1):
                 df = pd.DataFrame()
