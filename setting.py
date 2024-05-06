@@ -3,13 +3,13 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from pydantic import Field, computed_field
-from pydantic_settings import SettingsConfigDict, BaseSettings, PydanticBaseSettingsSource, YamlConfigSettingsSource
+from pydantic_settings import *
 
-_env_file = Path(__file__).parent / ".env"
+env_file = Path(__file__).parent / ".env"
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=_env_file, extra="ignore")
+    model_config = SettingsConfigDict(env_file=env_file, extra="ignore")
 
     db: str = Field(alias="db_url")
 
