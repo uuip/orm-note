@@ -9,6 +9,17 @@ from sa.session import Session
 
 s = Session()
 
+
+lc_collate = (
+    s.execute(
+        text(
+            "SELECT datcollate AS lc_collate,datctype AS lc_ctype FROM pg_database WHERE datname = CURRENT_DATABASE();"
+        ),
+    )
+    .mappings()
+    .one()
+)
+
 # &, | and ~
 
 # 字面字段,
