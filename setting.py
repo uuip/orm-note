@@ -52,6 +52,9 @@ class TomlSettings(CustomSources, source=TomlConfigSettingsSource):
 
 
 class YamlSettings(CustomSources, source=YamlConfigSettingsSource):
+    """
+    可以先写好yamle，使用 datamodel-code-generator 生产模型
+    """
     model_config = SettingsConfigDict(yaml_file="conf.yaml", extra="ignore")
 
     broker: str
