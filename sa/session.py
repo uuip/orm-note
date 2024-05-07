@@ -2,7 +2,7 @@ from sqlalchemy import *
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy.orm import *
 
-from setting import settings
+from conf import settings
 
 # 修改默认方言为psycopg
 # from sqlalchemy.dialects import postgresql as pg
