@@ -33,7 +33,12 @@ def is_unique(field):
 
 def field_rule(field: Column):
     if isinstance(field, Relationship):
-        raise ValueError("Relationship")
+        if list(field.remote_side)[0].table.name == list(field.local_columns)[0].table.name:
+            if field.nullable:
+                return
+            raise NotImplementedError("关联自己")
+        target_model = field.mapper.class_manager.class_
+        raise NotImplementedError("Relationship")
     if field.autoincrement is True or field.name == "id":
         return text("default")
     if isinstance(field.type, Enum):
@@ -94,7 +99,7 @@ def field_rule(field: Column):
         if callable(default):
             return default()
         return default
-    raise TypeError(f"no rule for this type: {field.type}")
+    raise NotImplementedError(f"no rule for this type: {field.type}")
 
 
 def make(model):
