@@ -25,7 +25,9 @@ def bulk_insert():
     s.add_all([user1, user2])
     s.commit()
 
-    # returning 触发 insertmanyvalues 优化；否则executemany; psycopg2的executemany很慢, psycopg的正常
+    # 下述2种insert，插入关联对象xxx时，其key应当使用 xxx_id,而不是映射的xxx
+
+    # returning 触发 insertmanyvalues 优化, key只能是字符串；否则executemany; psycopg2的executemany很慢, psycopg的正常
     # https://docs.sqlalchemy.org/en/20/core/connections.html#insert-many-values-behavior-for-insert-statements
     st = insert(Author).returning(Author.id)
     s.execute(
@@ -37,7 +39,7 @@ def bulk_insert():
     )
     s.commit()
 
-    # 不需 returning，一条语句 INSERT ... VALUES
+    # 不需 returning，一条语句 INSERT ... VALUES; key可以是Author.xxx
     # https://docs.sqlalchemy.org/en/20/core/dml.html#sqlalchemy.sql.expression.Insert.values
     st = insert(Author).values(
         [
