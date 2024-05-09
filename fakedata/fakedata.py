@@ -8,7 +8,7 @@ import pandas as pd
 from mimesis import Locale, Generic
 from sqlalchemy import *
 from sqlalchemy.dialects.postgresql import *
-from sqlalchemy.orm import *
+from sqlalchemy.orm.relationships import _RelationshipDeclared
 
 import faker
 
@@ -32,13 +32,6 @@ def is_unique(field):
 
 
 def field_rule(field: Column):
-    if isinstance(field, Relationship):
-        if list(field.remote_side)[0].table.name == list(field.local_columns)[0].table.name:
-            if field.nullable:
-                return
-            raise NotImplementedError("关联自己")
-        target_model = field.mapper.class_manager.class_
-        raise NotImplementedError("Relationship")
     if field.autoincrement is True or field.name == "id":
         return text("default")
     if isinstance(field.type, Enum):
@@ -82,7 +75,7 @@ def field_rule(field: Column):
         if "time" in field.name:
             t = g.datetime.datetime(start=yesterday.year)
             return t.isoformat()
-        return faker.cn_words(max_length=10)
+        return faker.cn_words(length=field.type.length or 5)
     if isinstance(field.type, (DateTime, TIMESTAMP)):
         if field.name == "end_at":
             return g.datetime.datetime(start=today.year, end=tomorrow.year)
@@ -102,8 +95,53 @@ def field_rule(field: Column):
     raise NotImplementedError(f"no rule for this type: {field.type}")
 
 
-def make(model):
-    return model(**{field_name: field_rule(field) for field_name, field in model.__mapper__.c.items()})
+def required_fields(model):
+    # 一个外键包含2个字段，实际字段author_id,映射字段author
+    # 找出被映射过的列，并返回_RelationshipDeclared，而不是author_id的列类型; 后者是int导致不能区分是否外键
+
+    #  orm 的列，不是db列，例如 from在python是关键字，orm里属性列是from_，而不是db的from
+    db_column_map_model_field = {v.name: k for k, v in model.__mapper__.c.items()}
+
+    fk_mapped_columns = {}
+
+    # attrs: 模型中定义的字段，外键同时包含实际字段author_id,映射字段author
+    for model_field, v in model.__mapper__.attrs.items():
+        if isinstance(v, _RelationshipDeclared):
+            if v.direction.name == "MANYTOONE":
+                db_column = list(v.local_columns)[0].name
+                fk_model_field = db_column_map_model_field[db_column]
+                fk_mapped_columns[fk_model_field] = v
+                print(f"model field: {fk_model_field}, db field: {db_column} -> {model_field}")
+            elif v.direction.name == "ONETOMANY":
+                print("no need")
+                continue
+            else:  # MANYTOMANY
+                print("handle MANYTOMANY by yourself")
+                continue
+
+    # c 不包含外键的映射字段author
+    for field_name, field in model.__mapper__.c.items():
+        if field_name in fk_mapped_columns:
+            yield field_name, fk_mapped_columns[field_name]
+        else:
+            yield field_name, field
+
+
+def make(model, size):
+    df = pd.DataFrame()
+    for field_name, field in required_fields(model):
+        if isinstance(field, _RelationshipDeclared):
+            local_column = list(field.local_columns)[0]
+            if list(field.remote_side)[0].table.name == local_column.table.name:
+                if local_column.nullable:
+                    return
+                raise NotImplementedError("关联自己")
+            target_model = field.mapper.class_manager.class_
+            obj = s.scalar(select(target_model).order_by(func.random()).limit(1))
+            df[field_name] = [obj.id] * size
+        else:
+            df[field_name] = [field_rule(field) for _ in range(size)]
+    return df
 
 
 if __name__ == "__main__":
@@ -112,13 +150,8 @@ if __name__ == "__main__":
     from sa.session import Session
 
     with Session() as s:
-        for t in ["author"]:
-            model = models[t]
-            for x in range(1):
-                df = pd.DataFrame()
-                for field_name, field in model.__mapper__.c.items():
-                    df[field_name] = [field_rule(field) for _ in range(100)]
-                with s.begin():
-                    st = insert(model).values(df.to_dict(orient="records"))
-                    s.execute(st)
-                t2 = datetime.datetime.now()
+        model = models["order"]
+        df = make(model, 1000)
+        st = insert(model).values(df.to_dict(orient="records"))
+        s.execute(st)
+        s.commit()

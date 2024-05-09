@@ -10,8 +10,8 @@ with open(parent / "1000姓氏.txt", "r") as f:
     surname = f.read().splitlines()[:200]
 
 
-def cn_words(max_length=2):
-    return "".join(random.choices(common_characters, k=max_length))
+def cn_words(length=2):
+    return "".join(random.choices(common_characters, k=length))
 
 
 def cn_name():
