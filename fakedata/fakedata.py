@@ -99,7 +99,7 @@ def required_fields(model):
     # 一个外键包含2个字段，实际字段author_id,映射字段author
 
     #  orm 的列，不是db列，例如 from在python是关键字，orm里属性列是from_，而不是db的from
-    db_column_map_model_field = {v.name: k for k, v in model.__mapper__.c.items()}
+    db_map_model = {v.name: k for k, v in model.__mapper__.c.items()}
 
     fk_mapped_columns = {}
 
@@ -109,7 +109,7 @@ def required_fields(model):
         if isinstance(v, _RelationshipDeclared):
             if v.direction.name == "MANYTOONE":
                 db_column = list(v.local_columns)[0].name
-                fk_model_field = db_column_map_model_field[db_column]
+                fk_model_field = db_map_model[db_column]
                 fk_mapped_columns[fk_model_field] = v
                 print(f"model field: {fk_model_field}, db field: {db_column} -> {model_field}")
             elif v.direction.name == "ONETOMANY":
