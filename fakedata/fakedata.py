@@ -97,14 +97,14 @@ def field_rule(field: Column):
 
 def required_fields(model):
     # 一个外键包含2个字段，实际字段author_id,映射字段author
-    # 找出被映射过的列，并返回_RelationshipDeclared，而不是author_id的列类型; 后者是int导致不能区分是否外键
 
     #  orm 的列，不是db列，例如 from在python是关键字，orm里属性列是from_，而不是db的from
     db_column_map_model_field = {v.name: k for k, v in model.__mapper__.c.items()}
 
     fk_mapped_columns = {}
 
-    # attrs: 模型中定义的字段，外键同时包含实际字段author_id,映射字段author
+    # 找出被映射过的列author_id，并返回_RelationshipDeclared，而不是author_id的列类型; 后者是int导致不能区分是否外键
+    # attrs: 同时包含实际字段author_id,映射字段author
     for model_field, v in model.__mapper__.attrs.items():
         if isinstance(v, _RelationshipDeclared):
             if v.direction.name == "MANYTOONE":
@@ -114,12 +114,10 @@ def required_fields(model):
                 print(f"model field: {fk_model_field}, db field: {db_column} -> {model_field}")
             elif v.direction.name == "ONETOMANY":
                 print("no need")
-                continue
             else:  # MANYTOMANY
                 print("handle MANYTOMANY by yourself")
-                continue
 
-    # c 不包含外键的映射字段author
+    # c: 不包含外键的映射字段author
     for field_name, field in model.__mapper__.c.items():
         if field_name in fk_mapped_columns:
             yield field_name, fk_mapped_columns[field_name]
@@ -151,7 +149,7 @@ if __name__ == "__main__":
 
     with Session() as s:
         model = models["order"]
-        df = make(model, 1000)
+        df = make(model, 10)
         st = insert(model).values(df.to_dict(orient="records"))
         s.execute(st)
         s.commit()
