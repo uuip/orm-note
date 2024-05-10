@@ -1,13 +1,13 @@
 from sqlalchemy import *
 from sqlalchemy.dialects.postgresql import insert
 
-from fakedata.fakedata import field_rule
+from fakedata.fakedata import general_rule
 from sa.model.example import Author
 from sa.session import Session
 
 
 def make_author():
-    return {"name": field_rule(Author.name), "org": field_rule(Author.org), "books": []}
+    return {"name": general_rule(Author.name), "org": general_rule(Author.org), "books": []}
 
 
 def insert_single():

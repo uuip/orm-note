@@ -45,5 +45,5 @@ def intto62(n: int):
     return "".join(rst)
 
 
-def unique_username():
+def unique_str():
     return intto62(uuid.uuid4().int)

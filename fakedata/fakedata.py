@@ -31,18 +31,9 @@ def is_unique(field):
             return x.unique
 
 
-def field_rule(field: Column):
+def general_rule(field: Column):
     if field.autoincrement is True or field.name == "id":
         return text("default")
-    if isinstance(field.type, Enum):
-        return random.choice(list(field.type.enums))
-    if isinstance(field.type, (JSON, JSONB)):
-        return {}
-    if isinstance(field.type, ARRAY):
-        return []
-
-    if isinstance(field.type, (INET, CIDR)):
-        return g.internet.ip_v4_object()
     if isinstance(field.type, Integer):
         return g.numeric.integer_number(start=1)
     if isinstance(field.type, Float):
@@ -51,7 +42,7 @@ def field_rule(field: Column):
         return g.development.boolean()
     if isinstance(field.type, (VARCHAR, Text, String)):
         if field.primary_key or is_unique(field):
-            return faker.unique_username()
+            return faker.unique_str()
         if "email" == field.name:
             return g.person.email(unique=True)
         if "username" == field.name:
@@ -86,13 +77,29 @@ def field_rule(field: Column):
         return g.datetime.date(start=today.year)
     if isinstance(field.type, (DECIMAL, Numeric, NUMERIC)):
         return g.numeric.decimal_number()
-
+    if isinstance(field.type, Enum):
+        return random.choice(list(field.type.enums))
+    if isinstance(field.type, (JSON, JSONB)):
+        return {}
+    if isinstance(field.type, ARRAY):
+        return []
+    if isinstance(field.type, (INET, CIDR)):
+        return g.internet.ip_v4_object()
     if field.default:
         default = field.default
         if callable(default):
             return default()
         return default
     raise NotImplementedError(f"no rule for this type: {field.type}")
+
+
+def relation_rule(field: _RelationshipDeclared):
+    local_column = list(field.local_columns)[0]
+    if list(field.remote_side)[0].table.name == local_column.table.name:
+        if local_column.nullable:
+            return
+        raise NotImplementedError("关联自己")
+    return field.mapper.class_manager.class_
 
 
 def required_fields(model):
@@ -125,20 +132,14 @@ def required_fields(model):
             yield field_name, field
 
 
-def make(model, size):
+def make_fake_data(model, size):
     df = pd.DataFrame()
     for field_name, field in required_fields(model):
         if isinstance(field, _RelationshipDeclared):
-            local_column = list(field.local_columns)[0]
-            if list(field.remote_side)[0].table.name == local_column.table.name:
-                if local_column.nullable:
-                    return
-                raise NotImplementedError("关联自己")
-            target_model = field.mapper.class_manager.class_
-            obj = s.scalar(select(target_model).order_by(func.random()).limit(1))
+            obj = s.scalar(select(relation_rule(field)).order_by(func.random()).limit(1))
             df[field_name] = [obj.id] * size
         else:
-            df[field_name] = [field_rule(field) for _ in range(size)]
+            df[field_name] = [general_rule(field) for _ in range(size)]
     return df
 
 
@@ -149,7 +150,7 @@ if __name__ == "__main__":
 
     with Session() as s:
         model = models["order"]
-        df = make(model, 10)
+        df = make_fake_data(model, 10)
         st = insert(model).values(df.to_dict(orient="records"))
         s.execute(st)
         s.commit()
