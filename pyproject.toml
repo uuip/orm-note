@@ -25,7 +25,7 @@ pydantic-settings = { git = "git@github.com:pydantic/pydantic-settings.git" }
 pyyaml = "^6.0.1"
 asyncpg = "^0.29.0"
 sqlacodegen = { git = "https://github.com/agronholm/sqlacodegen.git" }
-mimesis = "^16.0.0"
+mimesis = "^17.0.0"
 pandas = "^2.2.2"
 
 [build-system]
