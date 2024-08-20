@@ -1,7 +1,7 @@
 from sqlalchemy import *
 from sqlalchemy.dialects.postgresql import insert
 
-from fakedata.fakedata import general_rule
+from fakedata.rule import general_rule
 from sa.model.example import Author
 from sa.session import Session
 

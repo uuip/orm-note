@@ -1,16 +1,15 @@
 import datetime
+import pandas as pd
 import random
 import sys
 from functools import lru_cache
-from pathlib import Path
-
-import pandas as pd
 from mimesis import Locale, Generic
+from pathlib import Path
 from sqlalchemy import *
 from sqlalchemy.dialects.postgresql import *
 from sqlalchemy.orm.relationships import _RelationshipDeclared
 
-import faker
+import factory
 
 g = Generic(locale=Locale.ZH)
 
