@@ -9,7 +9,7 @@ from sqlalchemy import *
 from sqlalchemy.dialects.postgresql import *
 from sqlalchemy.orm.relationships import _RelationshipDeclared
 
-import factory
+from . import factory
 
 g = Generic(locale=Locale.ZH)
 
