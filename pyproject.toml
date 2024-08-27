@@ -14,7 +14,6 @@ priority = "primary"
 [tool.poetry.dependencies]
 python = "^3.12"
 setuptools = "^71.0.4"
-wheel = "^0.43.0"
 tzdata = { version = ">=2024.1", markers = "platform_system == 'Windows'" }
 
 sqlalchemy = { extras = ["asyncio"], version = "^2.0.30" }
