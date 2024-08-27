@@ -6,14 +6,9 @@ authors = ["uuip <uuip@users.noreply.github.com>"]
 readme = "README.md"
 package-mode = false
 
-[[tool.poetry.source]]
-name = "aliyun"
-url = "https://mirrors.aliyun.com/pypi/simple/"
-priority = "primary"
-
 [tool.poetry.dependencies]
 python = "^3.12"
-setuptools = "^71.0.4"
+setuptools = "*"
 tzdata = { version = ">=2024.1", markers = "platform_system == 'Windows'" }
 
 sqlalchemy = { extras = ["asyncio"], version = "^2.0.30" }
