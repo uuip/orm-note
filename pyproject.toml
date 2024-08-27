@@ -8,14 +8,12 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
-setuptools = "*"
-tzdata = { version = ">=2024.1", markers = "platform_system == 'Windows'" }
 
-sqlalchemy = { extras = ["asyncio"], version = "^2.0.30" }
+sqlalchemy = { extras = ["asyncio"], version = "^2.0.32" }
 psycopg = { extras = ["binary", "pool"], version = "^3.2.1" }
 pydantic = "^2.8.2"
-pydantic-settings = "^2.3.4"
-pyyaml = "^6.0.1"
+pydantic-settings = "^2.4.0"
+pyyaml = "^6.0.2"
 asyncpg = "^0.29.0"
 sqlacodegen = { git = "https://github.com/agronholm/sqlacodegen.git" }
 mimesis = "^17.0.0"
