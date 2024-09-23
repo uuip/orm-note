@@ -1,7 +1,7 @@
 from sqlalchemy import *
 
 from sa.model.example import Author
-from sa.session import Session
+from sa.session import SessionMaker
 
 
 def delete_obj():
@@ -18,6 +18,6 @@ def delete_with_query():
 
 
 if __name__ == "__main__":
-    with Session() as s:
+    with SessionMaker() as s:
         delete_obj()
         delete_with_query()

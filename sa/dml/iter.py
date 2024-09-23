@@ -3,7 +3,7 @@ import asyncio
 from sqlalchemy import select
 
 from sa.model.example import Author
-from sa.session import Session, async_session
+from sa.session import SessionMaker, async_session
 
 
 async def async_s():
@@ -18,6 +18,6 @@ def iter():
 
 
 if __name__ == "__main__":
-    with Session() as s:
+    with SessionMaker() as s:
         iter()
     asyncio.run(async_s())

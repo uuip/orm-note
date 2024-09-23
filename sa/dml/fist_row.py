@@ -2,7 +2,7 @@ from sqlalchemy import case, select, desc, func
 from sqlalchemy.orm import aliased
 
 from sa.model.example import ShipTransfer
-from sa.session import Session
+from sa.session import SessionMaker
 
 
 def get_first_row_every_group_distinct_on():
@@ -38,7 +38,7 @@ def get_first_row_every_group_window_func():
 
 
 if __name__ == "__main__":
-    with Session() as s:
+    with SessionMaker() as s:
         st = get_first_row_every_group_distinct_on()
         print(s.scalars(st).all())
         st = get_first_row_every_group_window_func()

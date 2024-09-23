@@ -7,7 +7,7 @@ from sqlalchemy.orm.attributes import flag_modified
 
 from conf import settings
 
-db = create_engine(settings.db)
+db = create_engine(settings.engine)
 session = sessionmaker(bind=db)
 
 

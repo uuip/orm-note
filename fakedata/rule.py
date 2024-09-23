@@ -145,9 +145,9 @@ def make_fake_data(model, size):
 if __name__ == "__main__":
     sys.path.append(str(Path(__file__).parent.parent.absolute()))
     from sa.reflect import models
-    from sa.session import Session
+    from sa.session import SessionMaker
 
-    with Session() as s:
+    with SessionMaker() as s:
         model = models["order"]
         df = make_fake_data(model, 10)
         st = insert(model).values(df.to_dict(orient="records"))
