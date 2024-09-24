@@ -41,7 +41,7 @@ def general_rule(field: Column):
         return g.development.boolean()
     if isinstance(field.type, (VARCHAR, Text, String)):
         if field.primary_key or is_unique(field):
-            return faker.unique_str()
+            return factory.unique_str()
         if "email" == field.name:
             return g.person.email(unique=True)
         if "username" == field.name:
@@ -65,7 +65,7 @@ def general_rule(field: Column):
         if "time" in field.name:
             t = g.datetime.datetime(start=yesterday.year)
             return t.isoformat()
-        return faker.cn_words(length=field.type.length or 5)
+        return factory.cn_words(length=field.type.length or 5)
     if isinstance(field.type, (DateTime, TIMESTAMP)):
         if field.name == "end_at":
             return g.datetime.datetime(start=today.year, end=tomorrow.year)

@@ -4,9 +4,6 @@ from sqlalchemy.orm import *
 
 from conf import settings
 
-# 修改默认方言为psycopg
-# from sqlalchemy.dialects import postgresql as pg
-# pg.dialect = pg.base.dialect = pg.psycopg.dialect
 
 # os.environ["PGTZ"] = "utc"
 # psycopg: connect_args={"options": "-c TimeZone=Asia/Tokyo"}
