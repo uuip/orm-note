@@ -9,7 +9,7 @@ from sqlalchemy import *
 from sqlalchemy.dialects.postgresql import *
 from sqlalchemy.orm.relationships import _RelationshipDeclared
 
-from . import factory
+from fakedata import factory
 
 g = Generic(locale=Locale.ZH)
 
@@ -148,7 +148,7 @@ if __name__ == "__main__":
     from sa.session import SessionMaker
 
     with SessionMaker() as s:
-        model = models["order"]
+        model = models["trees"]
         df = make_fake_data(model, 10)
         st = insert(model).values(df.to_dict(orient="records"))
         s.execute(st)
