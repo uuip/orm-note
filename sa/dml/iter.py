@@ -1,23 +1,37 @@
 import asyncio
 
-from sqlalchemy import select
+from sqlalchemy import *
+from sqlalchemy.orm import DeclarativeBase
 
-from sa.model.example import Author
-from sa.session import Session, async_session
+from sa.session import SessionMaker, AsyncSessionMaker
 
 
-async def async_s():
-    async with async_session().begin() as s:
-        async for x in await s.stream_scalars(select(Author).execution_options(yield_per=500)):
-            print(x.id)
+class Base(DeclarativeBase):
+    pass
+
+
+class Transactions(Base):
+    __tablename__ = "transactions_20230916"
+
+    tag_id = Column(Text, primary_key=True)
+    tx_hash = Column(Text)
+
+
+statement = select(Transactions).limit(5000).execution_options(yield_per=500)
+
+
+async def async_iter():
+    async with AsyncSessionMaker() as s:
+        async for _ in await s.stream_scalars(statement):
+            ...
 
 
 def iter():
-    for obj in s.scalars(select(Author).execution_options(yield_per=500)):
-        print(obj.id)
+    with SessionMaker() as s:
+        for _ in s.scalars(statement):
+            ...
 
 
 if __name__ == "__main__":
-    with Session() as s:
-        iter()
-    asyncio.run(async_s())
+    iter()
+    asyncio.run(async_iter())

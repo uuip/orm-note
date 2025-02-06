@@ -9,7 +9,7 @@ from sqlalchemy import *
 from sqlalchemy.dialects.postgresql import *
 from sqlalchemy.orm.relationships import _RelationshipDeclared
 
-from . import factory
+from fakedata import factory
 
 g = Generic(locale=Locale.ZH)
 
@@ -41,7 +41,7 @@ def general_rule(field: Column):
         return g.development.boolean()
     if isinstance(field.type, (VARCHAR, Text, String)):
         if field.primary_key or is_unique(field):
-            return faker.unique_str()
+            return factory.unique_str()
         if "email" == field.name:
             return g.person.email(unique=True)
         if "username" == field.name:
@@ -65,7 +65,7 @@ def general_rule(field: Column):
         if "time" in field.name:
             t = g.datetime.datetime(start=yesterday.year)
             return t.isoformat()
-        return faker.cn_words(length=field.type.length or 5)
+        return factory.cn_words(length=field.type.length or 5)
     if isinstance(field.type, (DateTime, TIMESTAMP)):
         if field.name == "end_at":
             return g.datetime.datetime(start=today.year, end=tomorrow.year)
@@ -145,10 +145,10 @@ def make_fake_data(model, size):
 if __name__ == "__main__":
     sys.path.append(str(Path(__file__).parent.parent.absolute()))
     from sa.reflect import models
-    from sa.session import Session
+    from sa.session import SessionMaker
 
-    with Session() as s:
-        model = models["order"]
+    with SessionMaker() as s:
+        model = models["trees"]
         df = make_fake_data(model, 10)
         st = insert(model).values(df.to_dict(orient="records"))
         s.execute(st)

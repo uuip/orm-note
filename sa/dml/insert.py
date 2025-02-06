@@ -3,7 +3,7 @@ from sqlalchemy.dialects.postgresql import insert
 
 from fakedata.rule import general_rule
 from sa.model.example import Author
-from sa.session import Session
+from sa.session import SessionMaker
 
 
 def make_author():
@@ -57,5 +57,5 @@ def bulk_insert():
 
 
 if __name__ == "__main__":
-    with Session() as s:
+    with SessionMaker() as s:
         bulk_insert()

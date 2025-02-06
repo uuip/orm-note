@@ -5,9 +5,9 @@ from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.sql import operators
 
 from sa.model.example import Author, Order, GeoIp
-from sa.session import Session
+from sa.session import SessionMaker
 
-s = Session()
+s = SessionMaker()
 
 
 lc_collate = (

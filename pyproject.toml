@@ -6,26 +6,18 @@ authors = ["uuip <uuip@users.noreply.github.com>"]
 readme = "README.md"
 package-mode = false
 
-[[tool.poetry.source]]
-name = "aliyun"
-url = "https://mirrors.aliyun.com/pypi/simple/"
-priority = "primary"
-
 [tool.poetry.dependencies]
-python = "^3.12"
-setuptools = "^71.0.4"
-wheel = "^0.43.0"
-tzdata = { version = ">=2024.1", markers = "platform_system == 'Windows'" }
+python = "^3.13"
 
-sqlalchemy = { extras = ["asyncio"], version = "^2.0.30" }
-psycopg = { extras = ["binary", "pool"], version = "^3.2.1" }
-pydantic = "^2.8.2"
-pydantic-settings = "^2.3.4"
-pyyaml = "^6.0.1"
-asyncpg = "^0.29.0"
+sqlalchemy = { extras = ["asyncio"], version = "^2.0.36" }
+psycopg = { extras = ["binary", "pool"], version = "^3.2.3" }
+pydantic = "^2.10.3"
+pydantic-settings = "^2.6.1"
+pyyaml = "^6.0.2"
+asyncpg = "^0.30.0"
 sqlacodegen = { git = "https://github.com/agronholm/sqlacodegen.git" }
-mimesis = "^17.0.0"
-pandas = "^2.2.2"
+mimesis = "^18.0.0"
+pandas = "^2.2.3"
 
 [build-system]
 requires = ["poetry-core"]

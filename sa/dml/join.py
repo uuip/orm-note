@@ -2,9 +2,9 @@ from sqlalchemy import *
 from sqlalchemy.orm import *
 
 from sa.model.example import Author, Order
-from sa.session import Session
+from sa.session import SessionMaker
 
-s = Session()
+s = SessionMaker()
 # 关联查询
 select(Author).join(Order, Author.id == Order.author_id).where(Order.price < 159)
 

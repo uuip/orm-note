@@ -1,7 +1,7 @@
 from sqlalchemy import *
 
 from sa.model.example import Author, Order, ShipTransfer, ShipTransfer2
-from sa.session import Session
+from sa.session import SessionMaker
 
 
 def update_single():
@@ -90,5 +90,5 @@ def correlated_updates():
 
 
 if __name__ == "__main__":
-    with Session() as s:
+    with SessionMaker() as s:
         bulk_update()

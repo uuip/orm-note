@@ -1,6 +1,5 @@
 # https://github.com/agronholm/sqlacodegen
 # https://github.com/sqlalchemy/alembic
-# https://docs.sqlalchemy.org/en/20/orm/mapped_attributes.html#synonyms
 # https://docs.sqlalchemy.org/en/20/orm/nonstandard_mappings.html#mapping-a-class-against-arbitrary-subqueries
 
 # 都有Enum
