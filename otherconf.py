@@ -1,3 +1,13 @@
+"""
+配置优先级：环境变量 > yaml 配置
+嵌套配置的环境变量使用2个下划线分割
+"""
+
+from functools import cached_property
+from pathlib import Path
+from urllib.parse import urlparse
+
+from pydantic import computed_field, BaseModel, Field
 from pydantic_settings import *
 
 
@@ -13,23 +23,78 @@ class CustomSources(BaseSettings):
             dotenv_settings: PydanticBaseSettingsSource,
             file_secret_settings: PydanticBaseSettingsSource,
         ) -> tuple[PydanticBaseSettingsSource, ...]:
-            return init_settings, env_settings, source(settings_cls), file_secret_settings
+            return (
+                init_settings,
+                env_settings,
+                source(settings_cls),
+                file_secret_settings,
+            )
 
         cls.settings_customise_sources = classmethod(func)
 
 
-class TomlSettings(CustomSources, source=TomlConfigSettingsSource):
-    model_config = SettingsConfigDict(toml_file="conf.toml", extra="ignore")
+class BscConfig(BaseModel):
+    """
+    环境变量设置：
+    BSC__NODE
+    BSC__INIT_BLOCK
+    """
 
-    broker: str
+    node: str = Field()
+    init_block: int
+
+
+class TronConfig(BaseModel):
+    """
+    环境变量设置：
+    TRON__NODE
+    TRON__INIT_BLOCK
+    TRON__API_KEY
+    """
+
+    node: str
+    init_block: int
+    api_key: str
+
+
+class PGConfig(BaseModel):
+    host: str = "127.0.0.1"
+    port: int
+    database: str
+    user: str | None
+    password: str | None
+
+
+yaml_file = Path(__file__).parent / "config.yaml"
 
 
 class YamlSettings(CustomSources, source=YamlConfigSettingsSource):
-    """
-    可以先写好yaml，使用 datamodel-code-generator 生成模型
-    """
+    model_config = SettingsConfigDict(
+        yaml_file=yaml_file, extra="ignore", env_nested_delimiter="__"
+    )
 
-    model_config = SettingsConfigDict(yaml_file="conf.yaml", extra="ignore")
+    @computed_field
+    @cached_property
+    def db(self) -> PGConfig:
+        c = urlparse(self.db_url)
+        return PGConfig(
+            host=c.hostname,
+            port=c.port or 5432,
+            database=c.path.lstrip("/"),
+            user=c.username,
+            password=c.password,
+        )
+
+    db_url: str
+    bsc: BscConfig
+    tron: TronConfig
+
+
+settings = YamlSettings()
+
+
+class TomlSettings(CustomSources, source=TomlConfigSettingsSource):
+    model_config = SettingsConfigDict(toml_file="conf.toml", extra="ignore")
 
     broker: str
 

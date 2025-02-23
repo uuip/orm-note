@@ -23,16 +23,17 @@ def usage_a():
     # outer context calls session.close()
 
 
+def usage_c():
+    # include begin()/commit()/rollback()
+    with SessionMaker.begin() as session:
+        session.execute(...)
+    # commits the transaction, closes the session
+
+
+# 与usage_c等价
 def usage_b():
     with SessionMaker() as session:
         with session.begin():
             session.execute(...)
         # inner context calls session.commit(), if there were no exceptions
     # outer context calls session.close()
-
-
-def usage_c():
-    # include begin()/commit()/rollback()
-    with SessionMaker.begin() as session:
-        session.execute(...)
-    # commits the transaction, closes the session
