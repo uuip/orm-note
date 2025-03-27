@@ -5,10 +5,9 @@
 
 from functools import cached_property
 from pathlib import Path
-from urllib.parse import urlparse
-
 from pydantic import computed_field, BaseModel, Field
 from pydantic_settings import *
+from urllib.parse import urlparse
 
 
 class CustomSources(BaseSettings):
@@ -44,19 +43,6 @@ class BscConfig(BaseModel):
     init_block: int
 
 
-class TronConfig(BaseModel):
-    """
-    环境变量设置：
-    TRON__NODE
-    TRON__INIT_BLOCK
-    TRON__API_KEY
-    """
-
-    node: str
-    init_block: int
-    api_key: str
-
-
 class PGConfig(BaseModel):
     host: str = "127.0.0.1"
     port: int
@@ -87,7 +73,6 @@ class YamlSettings(CustomSources, source=YamlConfigSettingsSource):
 
     db_url: str
     bsc: BscConfig
-    tron: TronConfig
 
 
 settings = YamlSettings()
@@ -97,23 +82,6 @@ class TomlSettings(CustomSources, source=TomlConfigSettingsSource):
     model_config = SettingsConfigDict(toml_file="conf.toml", extra="ignore")
 
     broker: str
-
-
-class YamlSettings1(BaseSettings):
-    model_config = SettingsConfigDict(yaml_file="conf.yaml", extra="ignore")
-
-    broker: str
-
-    @classmethod
-    def settings_customise_sources(
-        cls,
-        settings_cls: type[BaseSettings],
-        init_settings: PydanticBaseSettingsSource,
-        env_settings: PydanticBaseSettingsSource,
-        dotenv_settings: PydanticBaseSettingsSource,
-        file_secret_settings: PydanticBaseSettingsSource,
-    ) -> tuple[PydanticBaseSettingsSource, ...]:
-        return init_settings, env_settings, YamlConfigSettingsSource(settings_cls), file_secret_settings
 
 
 # [app]
@@ -132,6 +100,8 @@ class YamlSettings1(BaseSettings):
 # host = "1.2.3.4"
 # port = 80
 class PyprojectTomlSettings(CustomSources, source=PyprojectTomlConfigSettingsSource):
-    model_config = SettingsConfigDict(pyproject_toml_table_header=["app"], extra="ignore")
+    model_config = SettingsConfigDict(
+        pyproject_toml_table_header=["app"], extra="ignore"
+    )
 
     broker: str

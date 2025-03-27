@@ -28,6 +28,7 @@ class BaseSerializer(BaseModel):
     # 验证字段时实例还没有构造，不使用self
     # mode="before" 验证原始输入
     # mode="after" 默认值, 验证转换为定义字段后的值
+    # 有些字段是可选的，在入参没输入，必需使用model_validator
     @field_validator("created_at", "updated_at", mode="before")
     @classmethod
     def transform_time(cls, v) -> datetime:
