@@ -2,12 +2,8 @@ import pkgutil
 from importlib import import_module
 from pathlib import Path
 
-from sqlalchemy.dialects import postgresql
-from sqlalchemy.schema import CreateTable
-
 from sa.model import Base
-from sa.model.example import Author
-from sa.session import engine, SessionMaker
+from sa.session import engine
 
 if __name__ == "__main__":
     path = str(Path(__file__).parent / "model")
@@ -18,9 +14,3 @@ if __name__ == "__main__":
     ]
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
-
-    print(CreateTable(allmodels[0].__table__).compile(dialect=postgresql.dialect()))
-
-    from fakedata import make_fake_data
-
-    make_fake_data(SessionMaker, Author, 10)

@@ -1,7 +1,7 @@
 from sqlalchemy import *
 
 from sa.model.example import Author, Order, ShipTransfer, ShipTransfer2
-from sa.session import SessionMaker
+from sa.session import SessionMaker,engine
 
 
 def update_single():
@@ -9,18 +9,20 @@ def update_single():
     obj.org = "other"
     s.commit()
 
+    st = update(Author).where(Author.org == "other").values({Author.org:"other org"})
     st = update(Author).where(Author.org == "other").values(org="other org")
     s.execute(st)
     s.commit()
     print(obj.org)
 
     obj = s.scalar(select(Author).limit(1))
+    s.query(Author).filter(Author.id == obj.id).update({Author.org: "dskdkdkd"})
     s.query(Author).filter(Author.id == obj.id).update({"org": "dskdkdkd"})
     s.commit()
 
 
 def bulk_update():
-    for obj in s.scalars(select(Author).execution_options(yield_per=500)):
+    for obj in s.scalars(select(Author)):
         obj.nickname = "sometext"
     # executemany执行
     s.commit()
@@ -40,9 +42,11 @@ def bulk_update():
         {"v_name": "aaaa1", "nickname": "bindparambbbb"},
     ]
     st = update(Author).where(Author.nickname == bindparam("v_name"))
-    # with db.begin() as conn:
+    with db.begin() as conn:
+        conn.execute(st, to_update)
     with s.connection() as conn:
         conn.execute(st, to_update)
+        conn.commit()
 
 
 def update_from():

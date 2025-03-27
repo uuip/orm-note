@@ -9,11 +9,12 @@ from conf import settings
 
 # URL.create()
 # default pool_size=5
-engine = create_engine(settings.db, echo=False, pool_size=10)
-SessionMaker = sessionmaker(bind=engine, expire_on_commit=False)
+# sessionmaker: expire_on_commit=False
+engine = create_engine(settings.db_url, echo=False)
+SessionMaker = sessionmaker(bind=engine)
 
-async_engine = create_async_engine(settings.db_asyncpg, echo=False, pool_size=10)
-AsyncSessionMaker = async_sessionmaker(bind=async_engine, expire_on_commit=False)
+async_engine = create_async_engine(settings.db_asyncpg, echo=False)
+AsyncSessionMaker = async_sessionmaker(bind=async_engine)
 
 
 def usage_a():
