@@ -1,10 +1,9 @@
 import datetime
-import pandas as pd
 import random
-import sys
 from functools import lru_cache
+
+import pandas as pd
 from mimesis import Locale, Generic
-from pathlib import Path
 from sqlalchemy import *
 from sqlalchemy.dialects.postgresql import *
 from sqlalchemy.orm.relationships import _RelationshipDeclared
@@ -23,7 +22,11 @@ def is_unique(field):
     if field.unique:
         return field.unique
     for x in field.table.constraints:
-        if isinstance(x, UniqueConstraint) and len(x.columns) == 1 and field.name in x.columns:
+        if (
+            isinstance(x, UniqueConstraint)
+            and len(x.columns) == 1
+            and field.name in x.columns
+        ):
             return True
     for x in field.table.indexes:
         if isinstance(x, Index) and len(x.columns) == 1 and field.name in x.columns:
@@ -31,6 +34,7 @@ def is_unique(field):
 
 
 def general_rule(field: Column):
+    print(field.type)
     if field.autoincrement is True or field.name == "id":
         return text("default")
     if isinstance(field.type, Integer):
@@ -109,7 +113,8 @@ def required_fields(model):
 
     fk_mapped_columns = {}
 
-    # 找出被映射过的列author_id，并返回_RelationshipDeclared，而不是author_id的列类型; 后者是int导致不能区分是否外键
+    # 找出被映射过的列author_id，并返回_RelationshipDeclared，而不是author_id的列类型;
+    # 后者是int导致不能区分是否外键
     # attrs: 同时包含实际字段author_id,映射字段author
     for model_field, v in model.__mapper__.attrs.items():
         if isinstance(v, _RelationshipDeclared):
@@ -117,9 +122,11 @@ def required_fields(model):
                 db_column = list(v.local_columns)[0].name
                 fk_model_field = db_map_model[db_column]
                 fk_mapped_columns[fk_model_field] = v
-                print(f"model field: {fk_model_field}, db field: {db_column} -> {model_field}")
+                print(
+                    f"model field: {fk_model_field}, db field: {db_column} -> {model_field}"
+                )
             elif v.direction.name == "ONETOMANY":
-                print("no need")
+                print("ONETOMANY no need")
             else:  # MANYTOMANY
                 print("handle MANYTOMANY by yourself")
 
@@ -131,25 +138,17 @@ def required_fields(model):
             yield field_name, field
 
 
-def make_fake_data(model, size):
+def make_fake_data(session_maker, model, size):
     df = pd.DataFrame()
-    for field_name, field in required_fields(model):
-        if isinstance(field, _RelationshipDeclared):
-            obj = s.scalar(select(relation_rule(field)).order_by(func.random()).limit(1))
-            df[field_name] = [obj.id] * size
-        else:
-            df[field_name] = [general_rule(field) for _ in range(size)]
-    return df
-
-
-if __name__ == "__main__":
-    sys.path.append(str(Path(__file__).parent.parent.absolute()))
-    from sa.reflect import models
-    from sa.session import SessionMaker
-
-    with SessionMaker() as s:
-        model = models["trees"]
-        df = make_fake_data(model, 10)
+    with session_maker() as s:
+        for field_name, field in required_fields(model):
+            if isinstance(field, _RelationshipDeclared):
+                obj = s.scalar(
+                    select(relation_rule(field)).order_by(func.random()).limit(1)
+                )
+                df[field_name] = [obj.id] * size
+            else:
+                df[field_name] = [general_rule(field) for _ in range(size)]
         st = insert(model).values(df.to_dict(orient="records"))
         s.execute(st)
         s.commit()

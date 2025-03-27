@@ -26,7 +26,7 @@ class Author(Base):
     __tablename__ = "author"
 
     id = Column(BigInteger, Identity(), primary_key=True)
-    name = Column(Text, unique=True)
+    name = Column(Text, unique=True, nullable=False)
     org = Column(Text)
     books = Column(ARRAY(item_type=Integer))
     nickname: Mapped[Optional[str]]

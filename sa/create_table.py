@@ -6,7 +6,8 @@ from sqlalchemy.dialects import postgresql
 from sqlalchemy.schema import CreateTable
 
 from sa.model import Base
-from sa.session import engine
+from sa.model.example import Author
+from sa.session import engine, SessionMaker
 
 if __name__ == "__main__":
     path = str(Path(__file__).parent / "model")
@@ -19,3 +20,7 @@ if __name__ == "__main__":
     Base.metadata.create_all(bind=engine)
 
     print(CreateTable(allmodels[0].__table__).compile(dialect=postgresql.dialect()))
+
+    from fakedata import make_fake_data
+
+    make_fake_data(SessionMaker, Author, 10)
