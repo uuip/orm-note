@@ -7,7 +7,7 @@ parent = Path(__file__).parent
 with open(parent / "3500常用字.txt", encoding='utf8') as f:
     common_characters = list(f.read())
 with open(parent / "1000姓氏.txt", "r", encoding='utf8') as f:
-    surname = f.read().splitlines()[:200]
+    surname = f.read().splitlines()
 
 
 def cn_words(length=2):

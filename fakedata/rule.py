@@ -6,6 +6,8 @@ import pandas as pd
 from mimesis import Locale, Generic
 from sqlalchemy import *
 from sqlalchemy.dialects.postgresql import *
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm.decl_api import DeclarativeAttributeIntercept
 from sqlalchemy.orm.relationships import _RelationshipDeclared
 
 from . import factory
@@ -176,49 +178,56 @@ def get_related_actual_field_defines(model):
     return related_actual_field_defines
 
 
-def make_fake_data(session_maker, model, size=1):
-    # 填充字段数据
+def generate_related_field_data(s, model, field_name, field: _RelationshipDeclared, size):
     related_2_mapped = get_related_actual_field_defines(model)
-    df = pd.DataFrame()
+
+    target_model = get_related_model(field)
+
+    if related_2_mapped[field_name]["unique"]:  # one to one
+        related_size = size
+    else:
+        related_size = 1
+
+    if target_model is None:
+        objs = [None] * size
+    else:
+        objs = s.scalars(
+            select(target_model).order_by(func.random()).limit(related_size)
+        ).all()
+        if len(objs) < related_size:
+            make_fake_data(s, target_model, size=related_size - len(objs))
+        objs = s.scalars(
+            select(target_model).order_by(func.random()).limit(related_size)
+        ).all() * int(size / related_size)
+
+    if size == 1:
+        #  session.add() 方式
+        return related_2_mapped[field_name]["mapper_field"], objs
+    # insert 方式
+    return field_name, [getattr(obj, get_primary_key(target_model)) for obj in objs]
+
+
+def make(session_maker: sessionmaker, model: DeclarativeAttributeIntercept, size=1):
     with session_maker() as s:
-        for field_name, field in required_fields(model):
-            if isinstance(field, _RelationshipDeclared):
-                target_model = get_related_model(field)
+        make_fake_data(s, model, size)
 
-                if related_2_mapped[field_name]["unique"]:
-                    related_size = size
-                else:
-                    related_size = 1
 
-                if target_model is None:
-                    objs = [None] * size
-                else:
-                    objs = s.scalars(
-                        select(target_model).order_by(func.random()).limit(related_size)
-                    ).all()
-                    if len(objs) < related_size:
-                        make_fake_data(
-                            session_maker, target_model, size=related_size - len(objs)
-                        )
-                    objs = s.scalars(
-                        select(target_model).order_by(func.random()).limit(related_size)
-                    ).all() * int(size / related_size)
-
-                if size == 1:
-                    df[related_2_mapped[field_name]["mapper_field"]] = objs
-                else:
-                    df[field_name] = [
-                        getattr(obj, get_primary_key(target_model)) for obj in objs
-                    ]
-            else:
-                df[field_name] = [general_rule(field) for _ in range(size)]
-        if size == 1:
-            instance = model(**df.to_dict(orient="records")[0])
-            s.add(instance)
-            s.commit()
-            s.refresh(instance)
-            return instance
+def make_fake_data(s, model, size=1):
+    # 填充字段数据
+    df = pd.DataFrame()
+    for field_name, field in required_fields(model):
+        if isinstance(field, _RelationshipDeclared):
+            related_data = generate_related_field_data(s, model, field_name, field, size)
+            df[related_data[0]] = related_data[1]
         else:
-            st = insert(model).values(df.to_dict(orient="records"))
-            s.execute(st)
-            s.commit()
+            df[field_name] = [general_rule(field) for _ in range(size)]
+    if size == 1:
+        instance = model(**df.to_dict(orient="records")[0])
+        s.add(instance)
+        s.commit()
+        s.refresh(instance)
+        return instance
+    else:
+        st = insert(model).values(df.to_dict(orient="records"))
+        s.execute(st)
+        s.commit()
