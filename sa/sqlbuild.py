@@ -5,6 +5,7 @@ from sqlalchemy.sql.ddl import CreateTable
 
 # from sqlalchemy.dialects.mysql import mysqlconnector
 # dialect = mysqlconnector.dialect
+# dialect = psycopg.dialect(paramstyle="format") #%s
 
 
 dialect = DefaultDialect(paramstyle="qmark")

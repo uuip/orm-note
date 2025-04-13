@@ -9,12 +9,14 @@ def update_single():
     obj.org = "other"
     s.commit()
 
+    st = update(Author).where(Author.org == "other").values({Author.org:"other org"})
     st = update(Author).where(Author.org == "other").values(org="other org")
     s.execute(st)
     s.commit()
     print(obj.org)
 
     obj = s.scalar(select(Author).limit(1))
+    s.query(Author).filter(Author.id == obj.id).update({Author.org: "dskdkdkd"})
     s.query(Author).filter(Author.id == obj.id).update({"org": "dskdkdkd"})
     s.commit()
 
