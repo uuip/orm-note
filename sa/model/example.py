@@ -25,10 +25,10 @@ class Status(enum.StrEnum):
 class Author(Base):
     __tablename__ = "author"
 
-    id = Column(BigInteger, Identity(), primary_key=True)
-    name = Column(Text, unique=True, nullable=False)
-    org = Column(Text)
-    books = Column(ARRAY(item_type=Integer))
+    id = mapped_column(BigInteger, Identity(), primary_key=True)
+    name = mapped_column(Text, unique=True, nullable=False)
+    org = mapped_column(Text)
+    books = mapped_column(ARRAY(item_type=Integer))
     nickname: Mapped[Optional[str]]
 
     order_collection = relationship("Order", back_populates="author")
@@ -40,24 +40,24 @@ class Author(Base):
 class Order(Base):
     __tablename__ = "order"
 
-    id = Column(BigInteger, Identity(), primary_key=True)
-    updated_at = Column(
+    id = mapped_column(BigInteger, Identity(), primary_key=True)
+    updated_at = mapped_column(
         TIMESTAMP(timezone=True, precision=0),
         server_default=func.current_timestamp(0),
         onupdate=func.current_timestamp(),
     )
-    created_at = Column(
+    created_at = mapped_column(
         TIMESTAMP(timezone=True, precision=0),
         server_default=func.current_timestamp(),
     )
-    quantity = Column(BigInteger)
-    price_num = Column(Numeric(precision=10, scale=2))  # 总10位，小数2位
-    price = Column(Float)  # cast(...,Numeric(10,2)后再比较相等
-    status = Column(Enum(Status, native_enum=False))  # Enum 参数默认native_enum=True，等价pg ENUM type
-    # status = Column(Enum(Status, values_callable=lambda obj: [str(x.value) for x in obj]))
-    block_time = Column(BigInteger)
+    quantity = mapped_column(BigInteger)
+    price_num = mapped_column(Numeric(precision=10, scale=2))  # 总10位，小数2位
+    price = mapped_column(Float)  # cast(...,Numeric(10,2)后再比较相等
+    status = mapped_column(Enum(Status, native_enum=False))  # Enum 参数默认native_enum=True，等价pg ENUM type
+    # status = mapped_column(Enum(Status, values_callable=lambda obj: [str(x.value) for x in obj]))
+    block_time = mapped_column(BigInteger)
 
-    author_id = Column(ForeignKey(Author.id, ondelete="CASCADE"))
+    author_id = mapped_column(ForeignKey(Author.id, ondelete="CASCADE"))
     author = relationship(Author, back_populates="order_collection")
 
     # https://docs.sqlalchemy.org/en/20/orm/mapped_sql_expr.html
@@ -80,32 +80,32 @@ class GeoIp(Base):
         ),
     )
 
-    network = Column(CIDR, nullable=False, primary_key=True)
-    geoname_id = Column(Integer)
-    registered_country_geoname_id = Column(Integer)
-    represented_country_geoname_id = Column(Integer)
-    is_anonymous_proxy = Column(Boolean)
-    is_satellite_provider = Column(Boolean)
-    postal_code = Column(Text)
-    latitude = Column(Numeric)
-    longitude = Column(Numeric)
-    accuracy_radius = Column(Integer)
+    network = mapped_column(CIDR, nullable=False, primary_key=True)
+    geoname_id = mapped_column(Integer)
+    registered_country_geoname_id = mapped_column(Integer)
+    represented_country_geoname_id = mapped_column(Integer)
+    is_anonymous_proxy = mapped_column(Boolean)
+    is_satellite_provider = mapped_column(Boolean)
+    postal_code = mapped_column(Text)
+    latitude = mapped_column(Numeric)
+    longitude = mapped_column(Numeric)
+    accuracy_radius = mapped_column(Integer)
 
 
 class EventBase(Base):
     __abstract__ = True
 
-    id = Column(BigInteger, Identity(), primary_key=True)
-    transactionHash = Column(VARCHAR(66))
-    logIndex = Column(Integer)
+    id = mapped_column(BigInteger, Identity(), primary_key=True)
+    transactionHash = mapped_column(VARCHAR(66))
+    logIndex = mapped_column(Integer)
 
-    event = Column(Text, nullable=False)
-    transactionIndex = Column(Integer)
-    blockNumber = Column(Integer)
+    event = mapped_column(Text, nullable=False)
+    transactionIndex = mapped_column(Integer)
+    blockNumber = mapped_column(Integer)
 
-    from_ = Column(VARCHAR(42), name="from")
-    to = Column(VARCHAR(42))
-    token_id = Column(Integer, index=True)
+    from_ = mapped_column(VARCHAR(42), name="from")
+    to = mapped_column(VARCHAR(42))
+    token_id = mapped_column(Integer, index=True)
 
 
 class ShipTransfer(EventBase):
