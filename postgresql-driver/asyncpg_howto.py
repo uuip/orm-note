@@ -11,8 +11,8 @@ async def main():
     # Connection 不能with, autocommit为 True
     conn: Connection = await asyncpg.connect(settings.db_url)
     await conn.execute(
-            "INSERT INTO public.author (name,org,books,nickname) VALUES ($1,$2,$3,$4)", *["a", "org_a", [33], "xyz"]
-            )
+        "INSERT INTO public.author (name,org,books,nickname) VALUES ($1,$2,$3,$4)", *["a", "org_a", [33], "xyz"]
+    )
     await conn.close()
 
 

@@ -5,8 +5,8 @@ from conf import settings
 
 stmt = "SELECT version();"
 
-def t_mysqldb():
 
+def t_mysqldb():
 
     with pymysql.connect(**settings.db_dict) as conn:  # type:  Connection
         with conn.cursor(pymysql.cursors.DictCursor) as cursor:  # type: Cursor
@@ -17,6 +17,7 @@ def t_mysqldb():
 
 def t_mysql_pool():
     from dbutils.pooled_db import PooledDB
+
     pool = PooledDB(pymysql, **settings.db_dict, maxconnections=5)
     with pool.connection() as conn:  # type:  Connection
         with conn.cursor(pymysql.cursors.DictCursor) as cursor:  # type: Cursor

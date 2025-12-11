@@ -15,8 +15,8 @@ def timestamptz_endocder(v):
 
 async def transform(conn: asyncpg.Connection):
     await conn.set_type_codec(
-            schema="pg_catalog", typename="timestamptz", encoder=timestamptz_endocder, decoder=lambda x: x
-            )
+        schema="pg_catalog", typename="timestamptz", encoder=timestamptz_endocder, decoder=lambda x: x
+    )
 
 
 async def main():

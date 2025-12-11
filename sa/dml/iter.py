@@ -16,6 +16,7 @@ class Transactions(Base):
     tag_id = Column(Text, primary_key=True)
     tx_hash = Column(Text)
 
+
 # 这个过程不能commit
 stmt = select(Transactions).execution_options(yield_per=500)
 

@@ -22,7 +22,7 @@ def psycopg_copy_from():
     src_file = "/Users/sharp/Downloads/GeoLite2-City-Blocks-IPv4.csv"
     with psycopg.connect(...) as conn, open(src_file, "rb") as f:
         with conn.cursor().copy("COPY geoip2_network FROM STDIN with (format csv, header)") as copy:
-            while data := f.read(20 * 1024 ** 2):
+            while data := f.read(20 * 1024**2):
                 copy.write(data)
     src_file = "data.dump"
 
@@ -40,8 +40,6 @@ def psycopg_copy_to():
                 f.write(data)
     dst_file = "data.dump"
     with psycopg.connect(settings.db_psycopg) as conn, open(dst_file, "wb+") as f:
-        with conn.cursor().copy(
-                "COPY (select bsc_addr,tron_addr from address) TO STDOUT"
-                ) as copy:
+        with conn.cursor().copy("COPY (select bsc_addr,tron_addr from address) TO STDOUT") as copy:
             for data in copy:
                 f.write(data)

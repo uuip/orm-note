@@ -25,11 +25,7 @@ from pypika.terms import ValueWrapper
 def generate_sql(table_name, out_cols, clause_col, clause_val):
     t = Table(table_name)
     if clause_col:
-        q = (
-            PostgreSQLQuery.from_(t)
-            .select(*out_cols)
-            .where(Field(clause_col) == ValueWrapper(clause_val))
-        )
+        q = PostgreSQLQuery.from_(t).select(*out_cols).where(Field(clause_col) == ValueWrapper(clause_val))
     else:
         q = Query.from_(t).select(*out_cols)
     return q.limit(100).get_sql()

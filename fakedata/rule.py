@@ -24,11 +24,7 @@ def is_unique(field: Column):
     if field.unique:
         return field.unique
     for x in field.table.constraints:
-        if (
-            isinstance(x, UniqueConstraint)
-            and len(x.columns) == 1
-            and field.name in x.columns
-        ):
+        if isinstance(x, UniqueConstraint) and len(x.columns) == 1 and field.name in x.columns:
             return True
     for x in field.table.indexes:
         if isinstance(x, Index) and len(x.columns) == 1 and field.name in x.columns:
@@ -37,9 +33,7 @@ def is_unique(field: Column):
 
 def general_rule(field: Column):
     if field.primary_key and (
-        field.autoincrement is True
-        or isinstance(field.type, Integer)
-        or isinstance(field.identity, Identity)
+        field.autoincrement is True or isinstance(field.type, Integer) or isinstance(field.identity, Identity)
     ):
         return text("default")
     if field.server_default:
@@ -191,14 +185,12 @@ def generate_related_field_data(s, model, field_name, field: _RelationshipDeclar
     if target_model is None:
         objs = [None] * size
     else:
-        objs = s.scalars(
-            select(target_model).order_by(func.random()).limit(related_size)
-        ).all()
+        objs = s.scalars(select(target_model).order_by(func.random()).limit(related_size)).all()
         if len(objs) < related_size:
             make_fake_data(s, target_model, size=related_size - len(objs))
-        objs = s.scalars(
-            select(target_model).order_by(func.random()).limit(related_size)
-        ).all() * int(size / related_size)
+        objs = s.scalars(select(target_model).order_by(func.random()).limit(related_size)).all() * int(
+            size / related_size
+        )
 
     if size == 1:
         #  session.add() 方式

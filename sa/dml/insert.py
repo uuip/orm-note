@@ -18,17 +18,18 @@ def insert_single():
     print(user.id)
 
     st = insert(P).values(
-            {
-                    P.address     : address,
-                    P.has_approved: has_approved,
-                    }
-            )
+        {
+            P.address: address,
+            P.has_approved: has_approved,
+        }
+    )
     st = st.on_conflict_do_update(
-            index_elements=[P.address],
-            set_={"has_approved": st.excluded.has_approved},
-            )
+        index_elements=[P.address],
+        set_={"has_approved": st.excluded.has_approved},
+    )
     s.execute(st)
     s.commit()
+
 
 def bulk_insert():
     user1 = Author(**make_author())

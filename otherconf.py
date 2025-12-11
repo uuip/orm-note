@@ -55,9 +55,7 @@ yaml_file = Path(__file__).parent / "config.yaml"
 
 
 class YamlSettings(CustomSources, source=YamlConfigSettingsSource):
-    model_config = SettingsConfigDict(
-        yaml_file=yaml_file, extra="ignore", env_nested_delimiter="__"
-    )
+    model_config = SettingsConfigDict(yaml_file=yaml_file, extra="ignore", env_nested_delimiter="__")
 
     @computed_field
     @cached_property
@@ -100,8 +98,6 @@ class TomlSettings(CustomSources, source=TomlConfigSettingsSource):
 # host = "1.2.3.4"
 # port = 80
 class PyprojectTomlSettings(CustomSources, source=PyprojectTomlConfigSettingsSource):
-    model_config = SettingsConfigDict(
-        pyproject_toml_table_header=["app"], extra="ignore"
-    )
+    model_config = SettingsConfigDict(pyproject_toml_table_header=["app"], extra="ignore")
 
     broker: str

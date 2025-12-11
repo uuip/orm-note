@@ -1,7 +1,7 @@
 from sqlalchemy import *
 
 from sa.model.example import Author, Order, ShipTransfer, ShipTransfer2
-from sa.session import SessionMaker,engine
+from sa.session import SessionMaker, engine
 
 
 def update_single():
@@ -9,7 +9,7 @@ def update_single():
     obj.org = "other"
     s.commit()
 
-    st = update(Author).where(Author.org == "other").values({Author.org:"other org"})
+    st = update(Author).where(Author.org == "other").values({Author.org: "other org"})
     st = update(Author).where(Author.org == "other").values(org="other org")
     s.execute(st)
     s.commit()

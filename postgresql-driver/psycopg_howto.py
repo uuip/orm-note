@@ -13,13 +13,13 @@ from conf import settings
 
 options = "-c search_path=another -c timezone=America/Curacao"
 config = {
-        "host"    : "127.0.0.1",
-        "port"    : 5432,
-        "dbname"  : "fastapi-demo",
-        "user"    : "postgres",
-        "password": "postgres",
-        # "options": options,
-        }
+    "host": "127.0.0.1",
+    "port": 5432,
+    "dbname": "fastapi-demo",
+    "user": "postgres",
+    "password": "postgres",
+    # "options": options,
+}
 options = f"?options={quote(options)}"
 
 

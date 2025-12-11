@@ -22,19 +22,18 @@ class Settings(BaseSettings):
         else:
             default_port = 3306
         return {
-                "host"    : u.hostname,
-                "port"    : int(u.port) or default_port,
-                "user"    : u.username,
-                "password": u.password,
-                "database": u.path.lstrip("/")
-                }
+            "host": u.hostname,
+            "port": int(u.port or default_port),
+            "user": u.username,
+            "password": u.password,
+            "database": u.path.lstrip("/"),
+        }
 
     @computed_field
     @cached_property
     def db(self) -> str:
         u = urlparse(self.db_url)
         return u._replace(scheme=u.scheme.split("+")[0]).geturl()
-
 
     @computed_field
     @cached_property
