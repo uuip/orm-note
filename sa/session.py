@@ -9,7 +9,7 @@ from conf import settings
 
 # URL.create()
 # default pool_size=5
-# sessionmaker: expire_on_commit=False
+# sessionmaker: expire_on_commit=False, 时间类型是字符串，在提交后还是字符串
 engine = create_engine(settings.db_url, echo=False)
 SessionMaker = sessionmaker(bind=engine)
 

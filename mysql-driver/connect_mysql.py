@@ -10,7 +10,7 @@ from sqlalchemy.orm import *
 from conf import settings
 from sa.session import SessionMaker, engine
 
-
+# psycopg和aiomysql都使用%s为占位符, 而asyncpg使用$1
 class Base(DeclarativeBase):
     pass
 

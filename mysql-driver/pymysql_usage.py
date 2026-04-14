@@ -4,7 +4,7 @@ import pymysql
 from conf import settings
 
 stmt = "SELECT version();"
-
+# psycopg和aiomysql都使用%s为占位符, 而asyncpg使用$1
 
 def t_mysqldb():
 
