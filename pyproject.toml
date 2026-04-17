@@ -32,9 +32,9 @@ ignore = [
 
 [dependency-groups]
 mock = [
-    "polyfactory (>=3.3.0)",
-    "mimesis (>=19.1.0)",
-    "faker (>=40.8.0)",
-    "model-bakery (>=1.23.3)",
-    "hypothesis (>=6.151.9)"
+    "polyfactory (>=3.3.0)",    # 从类型注解自动生成 Pydantic/dataclass 模型实例，零配置
+    "mimesis (>=19.1.0)",       # 多语言假数据生成（姓名、地址、日期等），高性能
+    "faker (>=40.8.0)",         # 通用假数据生成库，社区生态丰富
+    "model-bakery (>=1.23.3)",  # Django Model 自动填充，框架专用
+    "hypothesis (>=6.151.9)"    # 属性测试框架，自动生成边界用例和随机输入
 ]
