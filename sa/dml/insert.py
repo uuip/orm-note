@@ -1,7 +1,7 @@
 from sqlalchemy import *
 from sqlalchemy.dialects.postgresql import insert
 
-from fakedata.populate import fake_column_value
+from fakedata import fake_column_value
 from sa.model.example import Author
 from sa.session import SessionMaker
 
