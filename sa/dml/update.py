@@ -42,7 +42,7 @@ def bulk_update():
         {"v_name": "aaaa1", "nickname": "bindparambbbb"},
     ]
     st = update(Author).where(Author.nickname == bindparam("v_name"))
-    with db.begin() as conn:
+    with engine.begin() as conn:
         conn.execute(st, to_update)
     with s.connection() as conn:
         conn.execute(st, to_update)

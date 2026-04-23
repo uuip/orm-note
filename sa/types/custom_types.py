@@ -2,7 +2,7 @@ import uuid
 from typing import Any
 
 import sqlalchemy as sa
-from sqlalchemy import CHAR, TEXT, TypeDecorator
+from sqlalchemy import CHAR, TypeDecorator, Text
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.engine.interfaces import Dialect
@@ -47,14 +47,14 @@ class StringUUID(TypeDecorator[uuid.UUID | str | None]):
 
 
 class LongText(TypeDecorator[str | None]):
-    impl = TEXT
+    impl = Text
     cache_ok = True
 
     def load_dialect_impl(self, dialect: Dialect) -> TypeEngine[Any]:
         if dialect.name == "mysql":
             return dialect.type_descriptor(LONGTEXT())
         else:
-            return dialect.type_descriptor(TEXT())
+            return dialect.type_descriptor(Text())
 
 
 class UniversalJSON(TypeDecorator[dict | list | None]):

@@ -4,12 +4,10 @@ from sqlalchemy.orm import *
 
 from conf import settings
 
-# os.environ["PGTZ"] = "utc"
-# psycopg: connect_args={"options": "-c TimeZone=Asia/Tokyo"}
-
-# URL.create()
-# default pool_size=5
-# sessionmaker: expire_on_commit=False, 时间类型是字符串，在提交后还是字符串
+# Other notes:
+# - URL.create()
+# - default pool_size=5
+# - sessionmaker(expire_on_commit=False): string datetime values stay as strings after commit
 engine = create_engine(settings.db_url, echo=False)
 SessionMaker = sessionmaker(bind=engine)
 

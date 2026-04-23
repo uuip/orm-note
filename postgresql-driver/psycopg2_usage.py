@@ -1,5 +1,5 @@
 import time
-from urllib.parse import quote
+from urllib.parse import quote, quote_plus
 
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -18,7 +18,7 @@ config = {
         "password": "postgres",
         # "options": options,
         }
-options = f"?options={quote(options)}"
+options = f"?options={quote_plus('-c timezone=America/Curacao')}"
 
 
 class User(BaseModel):

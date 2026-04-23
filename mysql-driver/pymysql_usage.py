@@ -1,14 +1,18 @@
+import pymysql
 from pymysql.connections import Connection
 from pymysql.cursors import Cursor
-import pymysql
+
 from conf import settings
 
 stmt = "SELECT version();"
+
+
 # psycopg和aiomysql都使用%s为占位符, 而asyncpg使用$1
 
-def t_mysqldb():
 
-    with pymysql.connect(**settings.db_dict, init_command="SET SESSION time_zone = 'Asia/Shanghai'") as conn:  # type:  Connection
+def t_mysqldb():
+    with pymysql.connect(**settings.db_dict,
+                         init_command="SET SESSION time_zone = 'Asia/Shanghai'") as conn:  # type:  Connection
         with conn.cursor(pymysql.cursors.DictCursor) as cursor:  # type: Cursor
             cursor.execute(stmt)
             for x in cursor:

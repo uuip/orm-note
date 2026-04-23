@@ -9,7 +9,6 @@ from sa.session import SessionMaker
 
 s = SessionMaker()
 
-
 lc_collate = (
     s.execute(
         text(

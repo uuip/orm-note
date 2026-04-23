@@ -1,5 +1,5 @@
 import time
-from urllib.parse import quote
+from urllib.parse import quote_plus
 
 import psycopg
 import psycopg_pool
@@ -11,16 +11,16 @@ from conf import settings
 
 # psycopg和aiomysql都使用%s为占位符, 而asyncpg使用$1
 
-options = "-c search_path=another -c timezone=America/Curacao"
+options = "-c search_path=another -c timezone=Asia/Shanghai"
 config = {
         "host"    : "127.0.0.1",
         "port"    : 5432,
         "dbname"  : "fastapi-demo",
         "user"    : "postgres",
         "password": "postgres",
-        # "options": options,
+        "options": options,
         }
-options = f"?options={quote(options)}"
+options = f"?options={quote_plus('-c timezone=America/Curacao')}"
 
 
 class User(BaseModel):
