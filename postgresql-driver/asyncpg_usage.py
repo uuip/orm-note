@@ -4,7 +4,7 @@ import time
 import asyncpg
 from asyncpg import Connection
 
-from conf import settings
+from config import settings
 
 # server_settings={"timezone": "Asia/Shanghai"}
 # 不读取PGTZ，TZ环境变量

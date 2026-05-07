@@ -7,7 +7,7 @@ SQLAlchemy provides ways to access both at class level and instance level.
 from sqlalchemy import BigInteger, Identity, Text, create_engine, inspect, select
 from sqlalchemy.orm import mapped_column, sessionmaker
 
-from conf import settings
+from config import settings
 from sa.model import Base
 
 

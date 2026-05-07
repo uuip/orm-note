@@ -1,7 +1,7 @@
 import psycopg
 from sqlalchemy import Engine
 
-from conf import settings
+from config import settings
 
 
 def psycopg2_copy_from(db: Engine):

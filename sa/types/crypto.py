@@ -8,7 +8,7 @@ from typing import Union
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
-from conf import settings
+from config import settings
 
 MAGIC_BYTES = b"AESV1GCM"  # 8-byte magic marker
 

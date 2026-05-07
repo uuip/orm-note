@@ -23,7 +23,7 @@ from sqlalchemy.dialects.postgresql.base import PGDialect
 from sqlalchemy.orm import *
 
 sys.path.append("..")
-from conf import settings
+from config import settings
 from models.model import StatusChoice
 
 

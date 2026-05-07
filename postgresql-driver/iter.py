@@ -4,7 +4,7 @@ import asyncpg
 import psycopg
 import psycopg_pool
 
-from conf import settings
+from config import settings
 
 
 async def asyncpg_iter():

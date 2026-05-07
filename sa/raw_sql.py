@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, text
 
-from conf import settings
+from config import settings
 
 engine = create_engine(settings.db_url, echo=False)
 

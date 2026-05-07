@@ -1,7 +1,7 @@
 import mysql.connector
 from mysql.connector import CMySQLConnection
 from mysql.connector.cursor_cext import CMySQLCursorDict
-from conf import settings
+from config import settings
 
 stmt = "SELECT version();"
 # psycopg和aiomysql都使用%s为占位符, 而asyncpg使用$1

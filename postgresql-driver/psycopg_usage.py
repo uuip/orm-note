@@ -7,7 +7,7 @@ from psycopg.rows import class_row, dict_row
 from psycopg.sql import SQL, Identifier  # noqa
 from pydantic import BaseModel
 
-from conf import settings
+from config import settings
 
 # psycopg和aiomysql都使用%s为占位符, 而asyncpg使用$1
 

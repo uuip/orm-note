@@ -5,7 +5,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from pydantic import BaseModel
 
-from conf import settings
+from config import settings
 
 # psycopg和aiomysql都使用%s为占位符, 而asyncpg使用$1
 

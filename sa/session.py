@@ -2,7 +2,7 @@ from sqlalchemy import *
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy.orm import *
 
-from conf import settings
+from config import settings
 
 # Other notes:
 # - URL.create()

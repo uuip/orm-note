@@ -2,7 +2,7 @@ import pymysql
 from pymysql.connections import Connection
 from pymysql.cursors import Cursor
 
-from conf import settings
+from config import settings
 
 stmt = "SELECT version();"
 
