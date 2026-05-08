@@ -1,13 +1,14 @@
+import uuid
+
 from sqlalchemy import *
 from sqlalchemy.dialects.postgresql import insert
 
-from fakedata import fake_column_value
 from sa.model.example import Author
 from sa.session import SessionMaker
 
 
 def make_author():
-    return {"name": fake_column_value(Author.name), "org": fake_column_value(Author.org), "books": []}
+    return {"name": uuid.uuid7(), "org": uuid.uuid7(), "books": []}
 
 
 def insert_single():
@@ -18,15 +19,15 @@ def insert_single():
     print(user.id)
 
     st = insert(P).values(
-        {
-            P.address: address,
-            P.has_approved: has_approved,
-        }
-    )
+            {
+                    P.address     : address,
+                    P.has_approved: has_approved,
+                    }
+            )
     st = st.on_conflict_do_update(
-        index_elements=[P.address],
-        set_={"has_approved": st.excluded.has_approved},
-    )
+            index_elements=[P.address],
+            set_={"has_approved": st.excluded.has_approved},
+            )
     s.execute(st)
     s.commit()
 
@@ -44,22 +45,22 @@ def bulk_insert():
     # https://docs.sqlalchemy.org/en/20/core/connections.html#insert-many-values-behavior-for-insert-statements
     st = insert(Author).returning(Author.id)
     s.execute(
-        st,
-        [
-            make_author(),
-            make_author(),
-        ],
-    )
+            st,
+            [
+                    make_author(),
+                    make_author(),
+                    ],
+            )
     s.commit()
 
     # 不需 returning，一条语句 INSERT ... VALUES; key可以是Author.xxx
     # https://docs.sqlalchemy.org/en/20/core/dml.html#sqlalchemy.sql.expression.Insert.values
     st = insert(Author).values(
-        [
-            make_author(),
-            make_author(),
-        ]
-    )
+            [
+                    make_author(),
+                    make_author(),
+                    ]
+            )
     s.execute(st)
     s.commit()
 
