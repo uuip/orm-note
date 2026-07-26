@@ -86,3 +86,10 @@ f'?init_command={quote_plus("SET time_zone='+08:00'")}'
 ```python
 connect_args={"init_command": "SET time_zone='+09:00'"}
 ```
+
+```
+aiomysql+uvloop:
+https://github.com/aio-libs/aiomysql/issues/966
+asyncpg:
+cannot use Connection.transaction() in a manually started transaction
+```
