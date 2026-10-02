@@ -1,6 +1,6 @@
-# https://github.com/agronholm/sqlacodegen
-# https://github.com/sqlalchemy/alembic
-# https://docs.sqlalchemy.org/en/20/orm/nonstandard_mappings.html#mapping-a-class-against-arbitrary-subqueries
+# 参考资料：https://github.com/agronholm/sqlacodegen
+# 参考资料：https://github.com/sqlalchemy/alembic
+# 参考资料：https://docs.sqlalchemy.org/en/20/orm/nonstandard_mappings.html#mapping-a-class-against-arbitrary-subqueries
 
 # 都有Enum
 # from sqlalchemy import Enum
@@ -31,7 +31,8 @@ class Author(Base):
     books = mapped_column(ARRAY(item_type=Integer))
     nickname: Mapped[Optional[str]]
 
-    order_collection = relationship("Order", back_populates="author")
+    # ORM 删除级联处理已加载的子对象；数据库 ON DELETE 处理未加载的子对象。
+    order_collection = relationship("Order", back_populates="author", cascade="all, delete", passive_deletes=True)
 
     def __repr__(self):
         return f"<{self.__class__.__name__} {self.name}>"
@@ -60,7 +61,7 @@ class Order(Base):
     author_id = mapped_column(ForeignKey(Author.id, ondelete="CASCADE"))
     author = relationship(Author, back_populates="order_collection")
 
-    # https://docs.sqlalchemy.org/en/20/orm/mapped_sql_expr.html
+    # 参考资料：https://docs.sqlalchemy.org/en/20/orm/mapped_sql_expr.html
     @hybrid_property
     def charge(self):
         return self.price * self.quantity

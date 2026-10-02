@@ -1,5 +1,5 @@
-# https://docs.sqlalchemy.org/en/20/orm/mapped_sql_expr.html#sql-expressions-as-mapped-attributes
-# https://docs.sqlalchemy.org/en/20/orm/mapped_attributes.html#synonyms
+# 参考资料：https://docs.sqlalchemy.org/en/20/orm/mapped_sql_expr.html#sql-expressions-as-mapped-attributes
+# 参考资料：https://docs.sqlalchemy.org/en/20/orm/mapped_attributes.html#synonyms
 
 from sqlalchemy import *
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
     Base.metadata.create_all(bind=engine)
     with SessionMaker() as s:
-        # ok
+        # 正确用法
         obj: Author = s.scalars(select(Author).where(Author.total_income > 1500)).first()
         if obj:
             print(obj.name)
@@ -45,8 +45,9 @@ if __name__ == "__main__":
         if obj:
             print(obj.name)
 
-        # ok
-        # 正确用法：将表达式提取到变量中，同时用于 with_expression 和 where
+        # 正确用法
+        # 推荐用法（每次查询临时计算不同表达式）：query_expression 配合 with_expression。
+        # 将表达式提取到变量中，同时用于 with_expression 和 where。
         total_in_expr = Author.wage * 12
         obj: Author = s.scalars(
             select(Author).options(with_expression(Author.total_income2, total_in_expr)).where(total_in_expr > 1500)

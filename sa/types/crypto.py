@@ -1,5 +1,9 @@
 """
-AES-GCM encryption and decryption utilities.
+AES-GCM 加密与解密工具。
+
+ENCRYPTION_KEY 应为经过 URL 安全 Base64 编码的 AES 密钥，原始长度为 16、24 或 32 字节。
+可用 base64.urlsafe_b64encode(os.urandom(32)).decode() 生成一次，
+此后保留并复用同一密钥，以便解密已保存的数据。
 """
 
 import base64
@@ -10,21 +14,23 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 from config import settings
 
-MAGIC_BYTES = b"AESV1GCM"  # 8-byte magic marker
+MAGIC_BYTES = b"AESV1GCM"  # 8 字节的格式标识
 
-# GCM parameters
-NONCE_SIZE = 12  # GCM recommended nonce size (bytes)
-TAG_SIZE = 16  # authentication tag size (bytes)
+# GCM 参数
+NONCE_SIZE = 12  # GCM 推荐的随机数长度，单位为字节
+TAG_SIZE = 16  # 认证标签长度，单位为字节
 
 
 def get_key() -> bytes:
+    if settings.encryption_key is None:
+        raise ValueError("ENCRYPTION_KEY is required for encryption and decryption")
     return base64.urlsafe_b64decode(settings.encryption_key.encode())
 
 
 def encrypt(data: Union[str, bytes]) -> str:
     """
-    Encrypt data with AES-GCM.
-    Return format: base64(MAGIC_BYTES + nonce + ciphertext + tag)
+    使用 AES-GCM 加密数据。
+    返回格式：base64(MAGIC_BYTES + nonce + ciphertext + tag)
     """
     if isinstance(data, str):
         data = data.encode()
@@ -83,6 +89,4 @@ if __name__ == "__main__":
     decrypted = decrypt(encrypted)
     print(f"Decrypted: {decrypted}")
     print(f"Verification: {'thisisapassword' == decrypted}")
-    print(
-        is_encrypted("9075bdb9b38e841687c1f574819f07ccd788f6a14cc2980cfd178c3cafd94a99")
-    )
+    print(is_encrypted("9075bdb9b38e841687c1f574819f07ccd788f6a14cc2980cfd178c3cafd94a99"))

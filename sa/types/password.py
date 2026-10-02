@@ -1,7 +1,7 @@
 """
-PassWord: auto-hashing SQLAlchemy column type (Django-compatible PBKDF2-SHA256).
+PassWord: auto-hashing SQLAlchemy column type using Argon2.
 
-Usage:
+用法：
     class User(Base):
         __tablename__ = 'users'
         id = Column(Integer, primary_key=True)
@@ -10,18 +10,19 @@ Usage:
 
 from typing import Any, Optional
 
-from passlib.context import CryptContext
+from pwdlib import PasswordHash
+from pwdlib.hashers.argon2 import Argon2Hasher
 from sqlalchemy import TypeDecorator, Text
 
-pwd_context = CryptContext(schemes=["django_pbkdf2_sha256"])
+password_hash = PasswordHash((Argon2Hasher(),))
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    return password_hash.verify(plain_password, hashed_password)
 
 
 def make_password(password: str) -> str:
-    return pwd_context.hash(password)
+    return password_hash.hash(password)
 
 
 class PassWord(TypeDecorator):

@@ -6,19 +6,16 @@ authors = [
     { name = "uuip", email = "uuip@users.noreply.github.com" }
 ]
 readme = "README.md"
-requires-python = ">=3.13,<4"
+requires-python = ">=3.14,<4"
 dependencies = [
-    "sqlalchemy >=2.0.48",
-    "pydantic >=2.12.5",
-    "pydantic-settings >=2.13.1",
-    "pyyaml >=6.0.3",
-    "pandas >=3.0.1",
-    "asyncpg >=0.31.0",
-    "psycopg[binary,pool] >=3.3.3",
-    "mysql-connector-python >=9.6.0",
-    "pymysql >=1.1.2",
-    "cryptography >=46.0.5",
-    "passlib>=1.7.4",
+    "sqlalchemy[asyncio] >=2.1.2",
+    "pydantic >=2.13.5",
+    "pydantic-settings >=2.15.0",
+    "psycopg[binary,pool] >=3.3.6",
+    "pymysql >=1.2.3",
+    "cryptography >=50.0.2",
+    "pwdlib[argon2]>=0.3.1",
+    "pypika>=0.51.1",
 ]
 
 [tool.uv]

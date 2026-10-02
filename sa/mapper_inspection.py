@@ -1,7 +1,7 @@
-"""Demonstrate the difference between ORM field names and database column names.
+"""演示 ORM 属性名与数据库列名的区别。
 
-When ORM field name differs from database column name (e.g., name -> username),
-SQLAlchemy provides ways to access both at class level and instance level.
+当 ORM 属性名与数据库列名不同（例如 name 对应 username）时，
+可通过映射信息分别取得两类名称，以及对应的实例值。
 """
 
 from sqlalchemy import BigInteger, Identity, Text, create_engine, inspect, select
@@ -12,17 +12,17 @@ from sa.model import Base
 
 
 def get_field_values(obj):
-    """Get model instance values mapped by ORM field names.
+    """按 ORM 属性名取得实例值。
 
-    Returns dict like: {'name': 'John', 'id': 1}
+    返回示例：{'name': 'John', 'id': 1}
     """
     return {field: getattr(obj, field) for field, _ in obj.__mapper__.c.items()}
 
 
 def get_column_values(obj):
-    """Get model instance values mapped by database column names.
+    """按数据库列名取得实例值。
 
-    Returns dict like: {'username': 'John', 'id': 1}
+    返回示例：{'username': 'John', 'id': 1}
     """
     return {col.name: getattr(obj, field) for field, col in obj.__mapper__.c.items()}
 
@@ -31,28 +31,28 @@ class Author(Base):
     __tablename__ = "user"
 
     id = mapped_column(BigInteger, Identity(), primary_key=True)
-    name = mapped_column("username", Text, unique=True, nullable=False)  # field: name, column: username
+    name = mapped_column("username", Text, unique=True, nullable=False)  # ORM 属性名为 name，数据库列名为 username。
 
 
 def inspect_class_mapping():
-    """Inspect ORM field names and database column names from the class."""
+    """从模型类检查 ORM 属性名与数据库列名。"""
     mapper = inspect(Author)
 
-    # ORM field names (Python attributes)
+    # ORM 属性名，即 Python 对象的属性。
     fields = list(mapper.c.keys())
     print(f"ORM fields: {fields}")  # ['id', 'name']
 
-    # Database column names
+    # 数据库列名。
     db_columns = [col.name for col in mapper.c]
     print(f"DB columns: {db_columns}")  # ['id', 'username']
 
-    # Field -> Column mapping
+    # ORM 属性名到数据库列名的映射。
     field_to_column = {key: col.name for key, col in mapper.c.items()}
     print(f"Field to column mapping: {field_to_column}")  # {'id': 'id', 'name': 'username'}
 
 
 def inspect_instance_values():
-    """Get instance values mapped by field names or column names."""
+    """分别按 ORM 属性名与数据库列名取得实例值。"""
     engine = create_engine(settings.db_url, echo=False)
     SessionMaker = sessionmaker(bind=engine)
 
@@ -61,11 +61,11 @@ def inspect_instance_values():
         author = session.scalar(stmt)
 
         if author:
-            # Values mapped by ORM field names
+            # 按 ORM 属性名组织实例值。
             field_values = get_field_values(author)
             print(f"Field values: {field_values}")  # {'id': 1, 'name': 'John'}
 
-            # Values mapped by database column names
+            # 按数据库列名组织实例值。
             column_values = get_column_values(author)
             print(f"Column values: {column_values}")  # {'id': 1, 'username': 'John'}
 

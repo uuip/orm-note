@@ -64,7 +64,7 @@ PGTZ > connect_args > URL parameters
 URL 参数可选转义：
 
 ```python
-f"?options={quote_plus('-c timezone=Asia/Tokyo')}"
+f"?options={quote('-c timezone=Asia/Tokyo')}"
 ```
 
 `connect_args` 的值会直接传给驱动，不需要 URL 转义：
@@ -78,7 +78,7 @@ PyMySQL 时区示例：
 URL 参数需要转义：
 
 ```python
-f'?init_command={quote_plus("SET time_zone='+08:00'")}'
+f'?init_command={quote("SET time_zone='+08:00'")}'
 ```
 
 `connect_args` 的值会直接传给驱动，不需要 URL 转义：

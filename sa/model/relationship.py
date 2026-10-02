@@ -6,8 +6,9 @@ from . import Base, OnDelete
 
 class MiddleTable(Base):
     __tablename__ = "association_table"
-    left_id = Column(ForeignKey("user.id"), primary_key=True)
-    right_id = Column(ForeignKey("project.id"), primary_key=True)
+    # 数据库级联只清理关联表记录，不删除另一端的父对象。
+    left_id = Column(ForeignKey("user.id", ondelete=OnDelete.cascade), primary_key=True)
+    right_id = Column(ForeignKey("project.id", ondelete=OnDelete.cascade), primary_key=True)
 
 
 class User(Base):
@@ -16,20 +17,36 @@ class User(Base):
     id = Column(BigInteger, primary_key=True)
     username = Column(String)
 
-    emails = relationship("Email", back_populates="user")
+    # cascade 常见写法：
+    # 不级联删除：省略 cascade，保留默认的 "save-update, merge"。
+    # 禁用所有级联：cascade=None（或 ""）；与省略 cascade 不同。
+    # 删除级联：cascade="all, delete"，Session.delete() 删除父对象时也删除子对象。
+    emails = relationship("Email", back_populates="user", cascade="all, delete", passive_deletes=True)
 
-    wife = relationship("Wife", uselist=False, back_populates="user")
+    profile = relationship("Profile", uselist=False, back_populates="user", cascade="all, delete", passive_deletes=True)
 
     country_id = Column(ForeignKey("country.id", ondelete=OnDelete.cascade))
     country = relationship("Country", back_populates="users")
 
     projects = relationship("Project", secondary=MiddleTable.__table__, back_populates="join_users")
 
-    allsendmsg = relationship("Message", foreign_keys="Message.sender_id", back_populates="sender")
-    allreceivedmsg = relationship("Message", foreign_keys="Message.receiver_id", back_populates="receiver")
+    allsendmsg = relationship(
+        "Message",
+        foreign_keys="Message.sender_id",
+        back_populates="sender",
+        cascade="all, delete",
+        passive_deletes=True,
+    )
+    allreceivedmsg = relationship(
+        "Message",
+        foreign_keys="Message.receiver_id",
+        back_populates="receiver",
+        cascade="all, delete",
+        passive_deletes=True,
+    )
 
 
-# onetomany
+# 一对多
 class Email(Base):
     __tablename__ = "email"
 
@@ -39,26 +56,26 @@ class Email(Base):
     user = relationship(User, back_populates="emails")
 
 
-# onetoone
-class Wife(Base):
-    __tablename__ = "wife"
+# 一对一
+class Profile(Base):
+    __tablename__ = "user_profile"
 
     id = Column(BigInteger, primary_key=True)
-    name = Column(String)
+    display_name = Column(String)
     user_id = Column(ForeignKey(User.id, ondelete=OnDelete.cascade), unique=True)
-    user = relationship(User, back_populates="wife")
+    user = relationship(User, back_populates="profile")
 
 
-# manytoone
+# 多对一
 class Country(Base):
     __tablename__ = "country"
 
     id = Column(BigInteger, primary_key=True)
     name = Column(String)
-    users = relationship(User, back_populates="country")
+    users = relationship(User, back_populates="country", cascade="all, delete", passive_deletes=True)
 
 
-# manytomany
+# 多对多
 class Project(Base):
     __tablename__ = "project"
 

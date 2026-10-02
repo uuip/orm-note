@@ -1,7 +1,7 @@
 """
-EncryptedString: auto encrypt/decrypt SQLAlchemy column type.
+EncryptedString：自动加密和解密的 SQLAlchemy 列类型。
 
-Usage:
+用法：
     class MyModel(Base):
         __tablename__ = 'my_model'
         id = Column(Integer, primary_key=True)
